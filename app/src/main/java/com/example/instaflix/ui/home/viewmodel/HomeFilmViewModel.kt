@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.instaflix.domain.exception.InternetException
 import com.example.instaflix.domain.model.Film
-import com.example.instaflix.domain.model.FilmResult
 import com.example.instaflix.domain.usecase.GetFilmsByCategoryUC
 import com.example.instaflix.domain.usecase.GetLocalFilmsByCategoryUC
 import com.example.instaflix.ui.home.state.HomeFilmState
@@ -16,6 +15,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,9 +30,10 @@ class HomeFilmViewModel @Inject constructor(
         get() = _viewState
 
     fun getFilmByCategory(category: String) {
-        getFilmsByCategoryUC.invoke(category).map { result ->
-            result.fold(
-                onSuccess = { filmResult: FilmResult ->
+        _viewState.postValue(HomeFilmState.Loader)
+        viewModelScope.launch(coroutineDispatcher) {
+            getFilmsByCategoryUC.invoke(category).fold(
+                onSuccess = { filmResult ->
                     _viewState.postValue(HomeFilmState.Success(filmResult.results))
                 },
                 onFailure = { error ->
@@ -43,9 +44,7 @@ class HomeFilmViewModel @Inject constructor(
                     }
                 },
             )
-        }.onStart {
-            _viewState.postValue(HomeFilmState.Loader)
-        }.flowOn(coroutineDispatcher).launchIn(viewModelScope)
+        }
     }
 
     private fun getLocalFilm(category: String) {

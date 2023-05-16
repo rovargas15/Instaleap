@@ -6,5 +6,5 @@ class GetFilmsByCategoryUC(
     private val remoteRepository: RemoteFilmRepository,
 ) {
 
-    fun invoke(category: String) = remoteRepository.getFilms(category)
+    suspend fun invoke(category: String) = remoteRepository.getFilms(category)
 }

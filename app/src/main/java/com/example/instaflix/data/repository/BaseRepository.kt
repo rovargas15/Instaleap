@@ -10,10 +10,12 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 open class BaseRepository {
-    inline fun <T, R> T.launchSafe(block: T.() -> R): R {
+    inline fun <T, R> T.launchSafe(block: T.() -> R): Result<R> {
         return runCatching {
             block()
-        }.getOrElse { throw getDomainException(it) }
+        }.onFailure {
+            Result.failure<R>(getDomainException(it))
+        }
     }
 
     /**
