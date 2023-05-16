@@ -1,6 +1,5 @@
 package com.example.instaflix.ui.home.screen
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
@@ -40,6 +39,7 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest.Builder
 import com.example.instaflix.R
 import com.example.instaflix.domain.model.Film
+import com.example.instaflix.ui.common.ContentError
 import com.example.instaflix.ui.home.nav.BottomNavItem
 import com.example.instaflix.ui.home.state.HomeFilmState
 import com.example.instaflix.ui.home.viewmodel.HomeFilmViewModel
@@ -60,7 +60,9 @@ fun HomeScreen(
     if (state.value == null) {
         viewModel.getFilmByCategory(category)
     }
-    ContentHome(navController, state, onSelectedFilm)
+    ContentHome(navController, state, onSelectedFilm) {
+        viewModel.getFilmByCategory(category)
+    }
 }
 
 @Composable
@@ -77,7 +79,7 @@ private fun AppTopBar() {
 }
 
 @Composable
-fun BottomBar(
+private fun BottomBar(
     navController: NavController,
 ) {
     val bottomNavItems = listOf(
@@ -111,10 +113,11 @@ fun BottomBar(
 }
 
 @Composable
-fun ContentHome(
+private fun ContentHome(
     navController: NavController,
     state: State<HomeFilmState?>,
     onSelectedFilm: ((film: Film) -> Unit)?,
+    onRetry: (() -> Unit),
 ) {
     Scaffold(
         topBar = { AppTopBar() },
@@ -159,7 +162,9 @@ fun ContentHome(
                     }
 
                     is HomeFilmState.Error -> {
-                        Log.e("state", "Error")
+                        ContentError() {
+                            onRetry.invoke()
+                        }
                     }
 
                     else -> Unit
@@ -171,7 +176,7 @@ fun ContentHome(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FilmCard(
+private fun FilmCard(
     isPlaceholder: Boolean = false,
     onSelectedItem: (() -> Unit)? = null,
     content: (@Composable ColumnScope.() -> Unit)? = null,
@@ -188,7 +193,7 @@ fun FilmCard(
 }
 
 @Composable
-fun FilmListItem(
+private fun FilmListItem(
     film: Film,
     onSelectedFilm: ((film: Film) -> Unit)? = null,
 ) {
@@ -214,7 +219,7 @@ fun FilmListItem(
 }
 
 @Composable
-fun FilmPoster(
+private fun FilmPoster(
     film: Film,
 ) {
     AsyncImage(

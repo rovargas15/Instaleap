@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Instaflix</string>
+    <string name="message_error">Ocurrrio un error, vuelve a intertarlo.</string>
+    <string name="btn_retry">Volver a intentar</string>
 </resources>

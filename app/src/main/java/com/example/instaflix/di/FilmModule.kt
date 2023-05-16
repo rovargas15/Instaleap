@@ -7,6 +7,7 @@ import com.example.instaflix.data.repository.RemoteFilmRepositoryImpl
 import com.example.instaflix.domain.repository.LocalFilmRepository
 import com.example.instaflix.domain.repository.RemoteFilmRepository
 import com.example.instaflix.domain.usecase.GetFilmsByCategoryUC
+import com.example.instaflix.domain.usecase.GetLocalFilmsByCategoryUC
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,6 +25,14 @@ object FilmModule {
         remoteFilmRepository: RemoteFilmRepository,
     ): GetFilmsByCategoryUC = GetFilmsByCategoryUC(
         remoteRepository = remoteFilmRepository,
+    )
+
+    @Provides
+    @ViewModelScoped
+    fun getFilmsLocalByCategoryUCProvider(
+        localRepository: LocalFilmRepository,
+    ): GetLocalFilmsByCategoryUC = GetLocalFilmsByCategoryUC(
+        localFilmRepository = localRepository,
     )
 
     @Provides
