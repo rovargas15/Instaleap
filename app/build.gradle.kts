@@ -123,6 +123,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.4.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation("androidx.compose.material:material-icons-extended:1.4.3")
 
     // Lotti
     implementation("com.airbnb.android:lottie-compose:6.0.0")
