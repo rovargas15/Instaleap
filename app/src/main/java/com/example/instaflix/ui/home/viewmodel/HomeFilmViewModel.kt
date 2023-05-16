@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.instaflix.domain.exception.TimeOutException
+import com.example.instaflix.domain.exception.InternetException
 import com.example.instaflix.domain.model.Film
 import com.example.instaflix.domain.model.FilmResult
 import com.example.instaflix.domain.usecase.GetFilmsByCategoryUC
@@ -36,7 +36,7 @@ class HomeFilmViewModel @Inject constructor(
                     _viewState.postValue(HomeFilmState.Success(filmResult.results))
                 },
                 onFailure = { error ->
-                    if (error is TimeOutException) {
+                    if (error is InternetException) {
                         getLocalFilm(category)
                     } else {
                         _viewState.postValue(HomeFilmState.Error)

@@ -1,10 +1,13 @@
 package com.example.instaflix.data.repository
 
 import com.example.instaflix.domain.exception.DomainException
+import com.example.instaflix.domain.exception.InternetException
 import com.example.instaflix.domain.exception.PermissionDeniedException
-import com.example.instaflix.domain.exception.TimeOutException
 import com.example.instaflix.domain.exception.UnknowException
+import java.net.ConnectException
 import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 open class BaseRepository {
     inline fun <T, R> T.launchSafe(block: T.() -> R): R {
@@ -43,8 +46,8 @@ open class BaseRepository {
     }
 
     private fun getDomainExceptionFromNativeException(error: Throwable): DomainException {
-        return if (error is java.net.SocketTimeoutException) {
-            TimeOutException()
+        return if (error is SocketTimeoutException || error is ConnectException || error is UnknownHostException) {
+            InternetException()
         } else {
             UnknowException()
         }

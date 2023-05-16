@@ -21,7 +21,6 @@ class RemoteFilmRepositoryImpl(
             saveInLocal(category, response)
             response.mapToEntity()
         }
-
         emit(Result.success(response))
     }.catch { error ->
         emit(Result.failure(error))

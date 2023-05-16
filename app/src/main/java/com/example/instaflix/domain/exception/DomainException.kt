@@ -15,7 +15,7 @@ class UnknowException(
     cause: Throwable? = null,
 ) : DomainException(message, cause)
 
-class TimeOutException(
+class InternetException(
     message: String? = null,
     cause: Throwable? = null,
 ) : DomainException(message, cause)
