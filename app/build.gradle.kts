@@ -82,6 +82,7 @@ val junit = "junit:junit:4.13.2"
 val room = "androidx.room:room-ktx:2.5.1"
 val roomCompiler = "androidx.room:room-compiler:2.5.1"
 val coil = "io.coil-kt:coil-compose:2.3.0"
+val placeholder = "com.google.accompanist:accompanist-placeholder-material:0.31.2-alpha"
 
 dependencies {
     implementation(coreKtx)
@@ -93,6 +94,7 @@ dependencies {
     implementation(composeUiGraphics)
     implementation(composeUiToolingPreview)
     implementation(composeMaterial3)
+    implementation(placeholder)
 
     implementation(daggerHiltAndroid)
     kapt(daggerHiltCompiler)
@@ -103,6 +105,7 @@ dependencies {
     implementation(retrofitMoshiConverter)
     implementation(okhttpLoggingInterceptor)
     implementation(moshiKotlin)
+    kapt("com.squareup.moshi:moshi-kotlin-codegen:1.15.0")
 
     implementation(room)
     kapt(roomCompiler)
@@ -117,7 +120,7 @@ dependencies {
     implementation("androidx.palette:palette-ktx:1.0.0")
 
     // Jetpack
-    // implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("androidx.compose.runtime:runtime-livedata:1.4.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
 

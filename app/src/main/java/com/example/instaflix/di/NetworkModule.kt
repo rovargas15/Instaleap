@@ -1,8 +1,8 @@
 package com.example.instaflix.di
 
-import com.example.instaflix.BuildConfig
 import com.example.instaflix.ui.utils.Urls.BASE
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,11 +29,8 @@ object NetworkModule {
     @Singleton
     fun httpInterceptor(): Interceptor {
         val interceptor = HttpLoggingInterceptor()
-        interceptor.level = if (BuildConfig.DEBUG) {
-            HttpLoggingInterceptor.Level.BODY
-        } else {
-            HttpLoggingInterceptor.Level.NONE
-        }
+        interceptor.level = HttpLoggingInterceptor.Level.BODY
+
         return interceptor
     }
 
@@ -60,9 +57,15 @@ object NetworkModule {
     fun retrofitProvider(
         client: OkHttpClient,
     ): Retrofit {
-        val moshi = Moshi.Builder().build()
-        return Retrofit.Builder().addConverterFactory(MoshiConverterFactory.create(moshi))
-            .client(client).baseUrl(BASE).build()
+        val moshi = Moshi.Builder()
+            .addLast(KotlinJsonAdapterFactory())
+            .build()
+
+        return Retrofit.Builder()
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .client(client)
+            .baseUrl(BASE)
+            .build()
     }
 }
 

@@ -2,12 +2,11 @@ package com.example.instaflix.di
 
 import com.example.instaflix.data.local.db.FilmDao
 import com.example.instaflix.data.remote.api.FilmApi
-import com.example.instaflix.data.repository.FilmLocalRepositoryImpl
-import com.example.instaflix.data.repository.FilmRemoteRepositoryImpl
-import com.example.instaflix.domain.repository.DomainExceptionRepository
-import com.example.instaflix.domain.repository.FilmLocalRepository
-import com.example.instaflix.domain.repository.FilmRemoteRepository
-import com.example.instaflix.domain.usecase.GetFilmsUC
+import com.example.instaflix.data.repository.LocalFilmRepositoryImpl
+import com.example.instaflix.data.repository.RemoteFilmRepositoryImpl
+import com.example.instaflix.domain.repository.LocalFilmRepository
+import com.example.instaflix.domain.repository.RemoteFilmRepository
+import com.example.instaflix.domain.usecase.GetFilmsByCategoryUC
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,21 +20,19 @@ object FilmModule {
 
     @Provides
     @ViewModelScoped
-    fun getFilmsUCProvider(
-        filmRemoteRepository: FilmRemoteRepository,
-    ): GetFilmsUC = GetFilmsUC(
-        remoteRepository = filmRemoteRepository,
+    fun getFilmsByCategoryUCProvider(
+        remoteFilmRepository: RemoteFilmRepository,
+    ): GetFilmsByCategoryUC = GetFilmsByCategoryUC(
+        remoteRepository = remoteFilmRepository,
     )
 
     @Provides
     @ViewModelScoped
     fun filmRemoteRepositoryImplProvider(
         filmApi: FilmApi,
-        domainExceptionRepository: DomainExceptionRepository,
-        localRepository: FilmLocalRepository,
-    ): FilmRemoteRepository = FilmRemoteRepositoryImpl(
+        localRepository: LocalFilmRepository,
+    ): RemoteFilmRepository = RemoteFilmRepositoryImpl(
         api = filmApi,
-        exception = domainExceptionRepository,
         localRepository = localRepository,
     )
 
@@ -43,7 +40,7 @@ object FilmModule {
     @ViewModelScoped
     fun filmLocalRepositoryImplProvider(
         filmDao: FilmDao,
-    ): FilmLocalRepository = FilmLocalRepositoryImpl(
+    ): LocalFilmRepository = LocalFilmRepositoryImpl(
         filmDao = filmDao,
     )
 

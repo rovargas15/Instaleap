@@ -1,7 +1,5 @@
 package com.example.instaflix.data.remote.model
 
-import com.example.instaflix.data.local.entity.FilmEntity
-import com.example.instaflix.domain.model.Film
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -21,37 +19,4 @@ data class FilmResponse(
     val video: Boolean,
     @Json(name = "vote_average") val voteAverage: Double,
     @Json(name = "vote_count") val voteCount: Int,
-) {
-    fun mapperToFilm() = Film(
-        adult = adult,
-        backdropPath = backdropPath,
-        id = id,
-        originalLanguage = originalLanguage,
-        originalTitle = originalTitle,
-        overview = overview,
-        popularity = popularity,
-        posterPath = posterPath,
-        releaseDate = releaseDate,
-        title = title,
-        video = video,
-        voteAverage = voteAverage,
-        voteCount = voteCount,
-    )
-
-    fun mapperToEntity(category: String) = FilmEntity(
-        adult = adult,
-        backdropPath = backdropPath,
-        id = id,
-        originalLanguage = originalLanguage,
-        originalTitle = originalTitle,
-        overview = overview,
-        popularity = popularity,
-        posterPath = posterPath,
-        releaseDate = releaseDate,
-        title = title,
-        video = video,
-        voteAverage = voteAverage,
-        voteCount = voteCount,
-        category = category,
-    )
-}
+)

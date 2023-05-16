@@ -1,10 +1,21 @@
 package com.example.instaflix.domain.exception
 
-open class DomainException(override val message: String = "") : Throwable(message)
-object NotFoundException : DomainException()
-object BadRequestException : DomainException()
-object InternalErrorException : DomainException()
-data class UnknownError(override val message: String = "") : DomainException()
-object Unauthorized : DomainException()
-object TimeOutException : DomainException()
-data class HttpErrorCode(val code: Int, override val message: String) : DomainException()
+sealed class DomainException(
+    message: String? = null,
+    cause: Throwable? = null,
+) : Throwable(message, cause)
+
+class PermissionDeniedException(
+    message: String? = null,
+    cause: Throwable? = null,
+) : DomainException(message, cause)
+
+class UnknowException(
+    message: String? = null,
+    cause: Throwable? = null,
+) : DomainException(message, cause)
+
+class TimeOutException(
+    message: String? = null,
+    cause: Throwable? = null,
+) : DomainException(message, cause)
