@@ -6,5 +6,5 @@ class GetLocalSeriesByCategoryUC(
     private val remoteRepository: SeriesRepository,
 ) {
 
-    suspend fun invoke(category: String) = remoteRepository.getLocalSeries(category)
+    fun invoke(category: String) = remoteRepository.getLocalSeries(category)
 }

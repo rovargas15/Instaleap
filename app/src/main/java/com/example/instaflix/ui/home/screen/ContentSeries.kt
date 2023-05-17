@@ -89,7 +89,7 @@ fun SeriesListItem(
         onSelectedItem = { onSelectedItem?.invoke(series.id) },
     ) {
         Column {
-            FilmPoster(series.posterPath ?: "")
+            FilmPoster(series.posterPath)
             Box(
                 contentAlignment = Alignment.BottomStart,
                 modifier = Modifier.fillMaxWidth().height(50.dp),

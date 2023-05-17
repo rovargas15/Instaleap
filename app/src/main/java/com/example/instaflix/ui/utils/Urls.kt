@@ -9,7 +9,6 @@ object Urls {
     const val FILMS = "movie/{$CATEGORY}?api_key=${BuildConfig.API_KEY}"
     const val SERIES = "tv/{$CATEGORY}?api_key=${BuildConfig.API_KEY}"
     const val FILM_DETAIL = "movie/$FILM_ID/?api_key=${BuildConfig.API_KEY}"
-    const val SERIES_DETAIL = "tv/$FILM_ID/?api_key=${BuildConfig.API_KEY}"
 }
 
 object UrlImage {

@@ -122,7 +122,7 @@ private fun BottomBar(
         BottomNavItem.MOVIE,
         BottomNavItem.SERIES,
     )
-    NavigationBar() {
+    NavigationBar {
         bottomNavItems.forEach { item ->
             val selected = item.route == backStackEntry.value?.destination?.route
 

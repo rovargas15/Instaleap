@@ -18,7 +18,7 @@ import com.example.instaflix.domain.model.Genre
 import com.example.instaflix.domain.model.Season
 import com.example.instaflix.domain.model.SeriesDetail
 
-fun BaseResponse<FilmResponse>.mapToEntity() = BaseResult<Film>(
+fun BaseResponse<FilmResponse>.mapToEntity() = BaseResult(
     dates = this.dates?.mapToEntity(),
     page = this.page,
     results = this.results.mapToEntity(),

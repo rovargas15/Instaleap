@@ -144,7 +144,7 @@ fun DetailFilmConstraintLayout(film: Film) {
                 },
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            ConstraintLayout() {
+            ConstraintLayout {
                 val (vote, star) = createRefs()
 
                 Text(
@@ -197,7 +197,7 @@ fun DetailSeriesConstraintLayout(series: Series) {
         )
 
         FilmPoster(
-            urlImage = series.posterPath ?: "",
+            urlImage = series.posterPath,
             size = w200,
             modifier = Modifier.height(
                 LocalDimensions.current.imageSmall,
@@ -239,7 +239,7 @@ fun DetailSeriesConstraintLayout(series: Series) {
                 },
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            ConstraintLayout() {
+            ConstraintLayout {
                 val (vote, star) = createRefs()
 
                 Text(
