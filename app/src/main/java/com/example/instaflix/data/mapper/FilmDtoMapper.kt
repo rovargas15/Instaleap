@@ -2,10 +2,9 @@ package com.example.instaflix.data.mapper
 
 import com.example.instaflix.data.local.dto.DateRangeDto
 import com.example.instaflix.data.local.dto.FilmDto
-import com.example.instaflix.data.local.dto.FilmResultDto
+import com.example.instaflix.domain.model.BaseResult
 import com.example.instaflix.domain.model.DateRange
 import com.example.instaflix.domain.model.Film
-import com.example.instaflix.domain.model.FilmResult
 
 fun FilmDto.mapToEntity() = Film(
     adult = adult,
@@ -41,8 +40,8 @@ fun List<FilmDto>.mapToEntity() = this.map {
     )
 }
 
-fun FilmResultDto.mapToEntity() = FilmResult(
-    dates = this.dates?.mapToEntity(),
+fun BaseResult<FilmDto>.mapToEntity() = BaseResult<Film>(
+    dates = this.dates,
     page = this.page,
     results = this.results.mapToEntity(),
     totalPages = this.totalPages,

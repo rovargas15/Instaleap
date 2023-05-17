@@ -1,9 +1,9 @@
 package com.example.instaflix.domain.model
 
-data class FilmResult(
+data class BaseResult<R>(
     val dates: DateRange? = null,
     val page: Int,
-    val results: List<Film>,
+    val results: List<R>,
     val totalPages: Int,
     val totalResults: Int,
 )

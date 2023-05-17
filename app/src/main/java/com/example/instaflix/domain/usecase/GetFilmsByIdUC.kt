@@ -1,10 +1,10 @@
 package com.example.instaflix.domain.usecase
 
-import com.example.instaflix.domain.repository.LocalFilmRepository
+import com.example.instaflix.domain.repository.FilmRepository
 
 class GetFilmsByIdUC(
-    private val localRepository: LocalFilmRepository,
+    private val filmRepository: FilmRepository,
 ) {
 
-    fun invoke(id: Long) = localRepository.getFilmById(id)
+    fun invoke(id: Long) = filmRepository.getFilmById(id)
 }

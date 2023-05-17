@@ -1,9 +1,71 @@
 package com.example.instaflix.ui.home.state
 
 import com.example.instaflix.domain.model.Film
+import com.example.instaflix.domain.model.Series
+import com.example.instaflix.ui.common.UiState
 
-sealed interface HomeFilmState {
-    object Loader : HomeFilmState
-    object Error : HomeFilmState
-    data class Success(val films: List<Film>) : HomeFilmState
+data class UpcomingUiState(
+    val films: List<Film> = emptyList(),
+    val isLoading: Boolean = false,
+    val errorObject: Pair<Boolean, String?>? = null,
+) : UiState {
+    override fun isError() = errorObject != null
+    override fun getErrorMessage(): String {
+        return this.errorObject?.second.orEmpty()
+    }
+}
+
+data class FilmsNowPlayingUiState(
+    val films: List<Film> = emptyList(),
+    val isLoading: Boolean = false,
+    val errorObject: Pair<Boolean, String?>? = null,
+) : UiState {
+    override fun isError() = errorObject != null
+    override fun getErrorMessage(): String {
+        return this.errorObject?.second.orEmpty()
+    }
+}
+
+data class PopularFilmsUiState(
+    val films: List<Film> = emptyList(),
+    val isLoading: Boolean = false,
+    val errorObject: Pair<Boolean, String?>? = null,
+) : UiState {
+    override fun isError() = errorObject != null
+    override fun getErrorMessage(): String {
+        return this.errorObject?.second.orEmpty()
+    }
+}
+
+data class TopRatedSeriesUiState(
+    val films: List<Series> = emptyList(),
+    val isLoading: Boolean = false,
+    val errorObject: Pair<Boolean, String?>? = null,
+) : UiState {
+    override fun isError() = errorObject != null
+    override fun getErrorMessage(): String {
+        return this.errorObject?.second.orEmpty()
+    }
+}
+
+data class OnTheAirSeriesUiState(
+    val films: List<Series> = emptyList(),
+    val isLoading: Boolean = false,
+    val errorObject: Pair<Boolean, String?>? = null,
+) : UiState {
+    override fun isError() = errorObject != null
+    override fun getErrorMessage(): String {
+        return this.errorObject?.second.orEmpty()
+    }
+}
+
+data class PopularSeriesUiState(
+    val films: List<Series> = emptyList(),
+    val isLoading: Boolean = false,
+    val errorObject: Pair<Boolean, String?>? = null,
+) : UiState {
+    override fun isError() = errorObject != null
+    override fun getErrorMessage(): String {
+        return this.errorObject?.second.orEmpty()
+    }
 }

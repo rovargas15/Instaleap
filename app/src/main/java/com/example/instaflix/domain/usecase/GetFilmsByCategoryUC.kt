@@ -1,9 +1,9 @@
 package com.example.instaflix.domain.usecase
 
-import com.example.instaflix.domain.repository.RemoteFilmRepository
+import com.example.instaflix.domain.repository.FilmRepository
 
 class GetFilmsByCategoryUC(
-    private val remoteRepository: RemoteFilmRepository,
+    private val remoteRepository: FilmRepository,
 ) {
 
     suspend fun invoke(category: String) = remoteRepository.getFilms(category)

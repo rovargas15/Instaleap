@@ -1,64 +1,110 @@
 package com.example.instaflix.ui.home.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.instaflix.domain.exception.InternetException
-import com.example.instaflix.domain.model.Film
 import com.example.instaflix.domain.usecase.GetFilmsByCategoryUC
 import com.example.instaflix.domain.usecase.GetLocalFilmsByCategoryUC
-import com.example.instaflix.ui.home.state.HomeFilmState
+import com.example.instaflix.domain.usecase.GetSeriesByCategoryUC
+import com.example.instaflix.ui.home.delegate.FilmsNowPlayingDelegate
+import com.example.instaflix.ui.home.delegate.OnTheAirSeriesDelegate
+import com.example.instaflix.ui.home.delegate.PopularFilmsDelegate
+import com.example.instaflix.ui.home.delegate.PopularSeriesDelegate
+import com.example.instaflix.ui.home.delegate.TopRatedSeriesDelegate
+import com.example.instaflix.ui.home.delegate.UpcomingFilmsDelegate
+import com.example.instaflix.ui.home.state.FilmsNowPlayingUiState
+import com.example.instaflix.ui.home.state.OnTheAirSeriesUiState
+import com.example.instaflix.ui.home.state.PopularFilmsUiState
+import com.example.instaflix.ui.home.state.PopularSeriesUiState
+import com.example.instaflix.ui.home.state.TopRatedSeriesUiState
+import com.example.instaflix.ui.home.state.UpcomingUiState
+import com.example.instaflix.ui.utils.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeFilmViewModel @Inject constructor(
-    private val getFilmsByCategoryUC: GetFilmsByCategoryUC,
-    private val getLocalFilmsByCategoryUC: GetLocalFilmsByCategoryUC,
-    private val coroutineDispatcher: CoroutineDispatcher,
+    getFilmsByCategoryUC: GetFilmsByCategoryUC,
+    getSeriesByCategoryUC: GetSeriesByCategoryUC,
+    getLocalFilmsByCategoryUC: GetLocalFilmsByCategoryUC,
+    coroutineDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
+    /*
+      Movie
+     */
+    private val upcomingDelegate = UpcomingFilmsDelegate(
+        UpcomingUiState(isLoading = true),
+        getFilmsByCategoryUC,
+        getLocalFilmsByCategoryUC,
+        coroutineDispatcher,
+        viewModelScope,
+    )
 
-    private val _viewState = MutableLiveData<HomeFilmState>(null)
-    val viewState: LiveData<HomeFilmState>
-        get() = _viewState
+    private val filmsNowPlayingDelegate = FilmsNowPlayingDelegate(
+        FilmsNowPlayingUiState(isLoading = true),
+        getFilmsByCategoryUC,
+        getLocalFilmsByCategoryUC,
+        coroutineDispatcher,
+        viewModelScope,
+    )
 
-    fun getFilmByCategory(category: String) {
-        _viewState.postValue(HomeFilmState.Loader)
-        viewModelScope.launch(coroutineDispatcher) {
-            getFilmsByCategoryUC.invoke(category).fold(
-                onSuccess = { filmResult ->
-                    _viewState.postValue(HomeFilmState.Success(filmResult.results))
-                },
-                onFailure = { error ->
-                    if (error is InternetException) {
-                        getLocalFilm(category)
-                    } else {
-                        _viewState.postValue(HomeFilmState.Error)
-                    }
-                },
-            )
-        }
+    private val popularFilmsDelegate = PopularFilmsDelegate(
+        PopularFilmsUiState(isLoading = true),
+        getFilmsByCategoryUC,
+        getLocalFilmsByCategoryUC,
+        coroutineDispatcher,
+        viewModelScope,
+    )
+
+    val upcomingFilmState get() = upcomingDelegate.getState()
+    val filmNowPlayingState get() = filmsNowPlayingDelegate.getState()
+    val popularFilmsState get() = popularFilmsDelegate.getState()
+
+    /*
+      Series
+     */
+    private val popularSeriesDelegate = PopularSeriesDelegate(
+        PopularSeriesUiState(isLoading = true),
+        getSeriesByCategoryUC,
+        coroutineDispatcher,
+        viewModelScope,
+    )
+
+    private val topRatedSeriesDelegate = TopRatedSeriesDelegate(
+        TopRatedSeriesUiState(isLoading = true),
+        getSeriesByCategoryUC,
+        coroutineDispatcher,
+        viewModelScope,
+    )
+
+    private val onTheAirSeriesDelegate = OnTheAirSeriesDelegate(
+        OnTheAirSeriesUiState(isLoading = true),
+        getSeriesByCategoryUC,
+        coroutineDispatcher,
+        viewModelScope,
+    )
+
+    val popularSeriesState get() = popularSeriesDelegate.getState()
+    val topRatedSeriesPlayingState get() = topRatedSeriesDelegate.getState()
+    val onTheAirSeriesState get() = onTheAirSeriesDelegate.getState()
+
+    private fun onLoadMovie() {
+        upcomingDelegate.fetchData()
+        filmsNowPlayingDelegate.fetchData()
+        popularFilmsDelegate.fetchData()
     }
 
-    private fun getLocalFilm(category: String) {
-        getLocalFilmsByCategoryUC.invoke(category).map { result ->
-            result.fold(
-                onSuccess = { films: List<Film> ->
-                    _viewState.postValue(HomeFilmState.Success(films))
-                },
-                onFailure = {
-                    _viewState.postValue(HomeFilmState.Error)
-                },
-            )
-        }.onStart {
-            _viewState.postValue(HomeFilmState.Loader)
-        }.flowOn(coroutineDispatcher).launchIn(viewModelScope)
+    private fun onLoadSeries() {
+        popularSeriesDelegate.fetchData()
+        topRatedSeriesDelegate.fetchData()
+        onTheAirSeriesDelegate.fetchData()
+    }
+
+    fun onLoad(route: String) {
+        if (route == Route.MOVIE) {
+            onLoadMovie()
+        } else {
+            onLoadSeries()
+        }
     }
 }

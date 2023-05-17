@@ -2,8 +2,7 @@ package com.example.instaflix.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.instaflix.data.local.db.FilmDao
-import com.example.instaflix.data.local.db.FilmDatabase
+import com.example.instaflix.data.local.db.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,19 +16,21 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): FilmDatabase {
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
         return Room.databaseBuilder(
             context,
-            FilmDatabase::class.java,
+            AppDatabase::class.java,
             DB_NAME,
         ).build()
     }
 
     @Provides
     @Singleton
-    fun userDaoProvider(appDatabase: FilmDatabase): FilmDao {
-        return appDatabase.movieDao()
-    }
+    fun filmDaoProvider(appDatabase: AppDatabase) = appDatabase.FilmDao()
+
+    @Provides
+    @Singleton
+    fun seriesDaoProvider(appDatabase: AppDatabase) = appDatabase.SeriesDao()
 }
 
 private const val DB_NAME = "FilmDB"

@@ -9,12 +9,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
-import com.example.instaflix.domain.model.Film
 import com.example.instaflix.ui.detail.screen.DetailScreen
 import com.example.instaflix.ui.detail.viewmodel.DetailFilmViewModel
 import com.example.instaflix.ui.home.screen.HomeScreen
-import com.example.instaflix.ui.search.screen.SearchScreen
-import com.example.instaflix.ui.utils.Category
 import com.example.instaflix.ui.utils.Graph
 import com.example.instaflix.ui.utils.Parameter
 import com.example.instaflix.ui.utils.Route
@@ -33,33 +30,24 @@ fun AppNavigation(
 fun NavGraphBuilder.mainGraph(
     navController: NavHostController,
 ) {
-    navigation(startDestination = Route.POPULAR, route = Graph.MAIN_GRAPH) {
-        composable(route = Route.POPULAR) {
-            HomeScreen(Category.POPULAR, navController) { film: Film ->
-                navController.navigate("${Route.FILM_DETAIL}${film.id}")
+    navigation(startDestination = Route.MOVIE, route = Graph.MAIN_GRAPH) {
+        composable(route = Route.MOVIE) {
+            HomeScreen(navController) { id: Long ->
+                navController.navigate("detail/$id?")
             }
         }
 
-        composable(route = Route.UPCOMING) {
-            HomeScreen(Category.UPCOMING, navController) { film: Film ->
-                navController.navigate("${Route.FILM_DETAIL}${film.id}")
+        composable(route = Route.SERIES) {
+            HomeScreen(navController) { id: Long ->
+                navController.navigate("detail/?$id")
             }
-        }
-
-        composable(route = Route.PLAYING_NOW) {
-            HomeScreen(Category.PLAYING_NOW, navController) { film: Film ->
-                navController.navigate("${Route.FILM_DETAIL}${film.id}")
-            }
-        }
-
-        composable(route = Route.SEARCH) {
-            SearchScreen()
         }
 
         composable(
-            route = "${Route.FILM_DETAIL}{${Parameter.FILM_ID}}",
+            route = "${Route.FILM_DETAIL}{${Parameter.FILM_ID}}?{${Parameter.SERIES_ID}}",
             arguments = listOf(
-                navArgument(Parameter.FILM_ID) { type = NavType.LongType },
+                navArgument(Parameter.FILM_ID) { type = NavType.StringType; },
+                navArgument(Parameter.SERIES_ID) { type = NavType.StringType; },
             ),
         ) { backStackEntry ->
             val detailMovieViewModel: DetailFilmViewModel = hiltViewModel(backStackEntry)

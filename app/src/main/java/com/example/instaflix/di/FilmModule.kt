@@ -2,11 +2,10 @@ package com.example.instaflix.di
 
 import com.example.instaflix.data.local.db.FilmDao
 import com.example.instaflix.data.remote.api.FilmApi
-import com.example.instaflix.data.repository.LocalFilmRepositoryImpl
-import com.example.instaflix.data.repository.RemoteFilmRepositoryImpl
-import com.example.instaflix.domain.repository.LocalFilmRepository
-import com.example.instaflix.domain.repository.RemoteFilmRepository
+import com.example.instaflix.data.repository.FilmRepositoryImpl
+import com.example.instaflix.domain.repository.FilmRepository
 import com.example.instaflix.domain.usecase.GetFilmsByCategoryUC
+import com.example.instaflix.domain.usecase.GetFilmsByIdUC
 import com.example.instaflix.domain.usecase.GetLocalFilmsByCategoryUC
 import dagger.Module
 import dagger.Provides
@@ -22,34 +21,34 @@ object FilmModule {
     @Provides
     @ViewModelScoped
     fun getFilmsByCategoryUCProvider(
-        remoteFilmRepository: RemoteFilmRepository,
+        filmRepository: FilmRepository,
     ): GetFilmsByCategoryUC = GetFilmsByCategoryUC(
-        remoteRepository = remoteFilmRepository,
+        remoteRepository = filmRepository,
+    )
+
+    @Provides
+    @ViewModelScoped
+    fun getFilmsByIdUCProvider(
+        filmRepository: FilmRepository,
+    ): GetFilmsByIdUC = GetFilmsByIdUC(
+        filmRepository = filmRepository,
     )
 
     @Provides
     @ViewModelScoped
     fun getFilmsLocalByCategoryUCProvider(
-        localRepository: LocalFilmRepository,
+        filmRepository: FilmRepository,
     ): GetLocalFilmsByCategoryUC = GetLocalFilmsByCategoryUC(
-        localFilmRepository = localRepository,
+        filmRepository = filmRepository,
     )
 
     @Provides
     @ViewModelScoped
-    fun filmRemoteRepositoryImplProvider(
+    fun filmRepositoryImplProvider(
         filmApi: FilmApi,
-        localRepository: LocalFilmRepository,
-    ): RemoteFilmRepository = RemoteFilmRepositoryImpl(
-        api = filmApi,
-        localRepository = localRepository,
-    )
-
-    @Provides
-    @ViewModelScoped
-    fun filmLocalRepositoryImplProvider(
         filmDao: FilmDao,
-    ): LocalFilmRepository = LocalFilmRepositoryImpl(
+    ): FilmRepository = FilmRepositoryImpl(
+        api = filmApi,
         filmDao = filmDao,
     )
 

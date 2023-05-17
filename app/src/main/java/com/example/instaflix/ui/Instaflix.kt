@@ -1,4 +1,4 @@
-package com.example.instaflix.ui.base
+package com.example.instaflix.ui
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
