@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class FilmDto(
+data class FilmEntity(
     @PrimaryKey val id: Long,
     val adult: Boolean,
     val backdropPath: String?,

@@ -23,7 +23,7 @@ object FilmModule {
     fun getFilmsByCategoryUCProvider(
         filmRepository: FilmRepository,
     ): GetFilmsByCategoryUC = GetFilmsByCategoryUC(
-        remoteRepository = filmRepository,
+        filmRepository = filmRepository,
     )
 
     @Provides

@@ -1,9 +1,9 @@
 package com.example.instaflix.data.mapper
 
-import com.example.instaflix.data.local.dto.FilmDto
+import com.example.instaflix.data.local.dto.FilmEntity
 import com.example.instaflix.domain.model.Film
 
-fun FilmDto.mapToEntity() = Film(
+fun FilmEntity.mapToBaseResult() = Film(
     adult = adult,
     backdropPath = backdropPath,
     id = id,
@@ -19,7 +19,7 @@ fun FilmDto.mapToEntity() = Film(
     voteCount = voteCount,
 )
 
-fun List<FilmDto>.mapToEntity() = this.map {
+fun List<FilmEntity>.mapToFilms() = this.map {
     Film(
         adult = it.adult,
         backdropPath = it.backdropPath,

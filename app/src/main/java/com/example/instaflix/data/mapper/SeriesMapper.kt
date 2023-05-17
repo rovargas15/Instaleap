@@ -1,20 +1,20 @@
 package com.example.instaflix.data.mapper
 
-import com.example.instaflix.data.local.dto.SeriesDto
+import com.example.instaflix.data.local.dto.SeriesEntity
 import com.example.instaflix.data.remote.model.BaseResponse
 import com.example.instaflix.data.remote.model.SeriesResponse
 import com.example.instaflix.domain.model.BaseResult
 import com.example.instaflix.domain.model.Series
 
-fun BaseResponse<SeriesResponse>.mapToEntity() = BaseResult(
-    dates = this.dates?.mapToEntity(),
+fun BaseResponse<SeriesResponse>.mapToBaseResult() = BaseResult(
+    dates = this.dates?.mapToDateRange(),
     page = this.page,
-    results = this.results.map { it.mapToEntity() },
+    results = this.results.map { it.mapToSeries() },
     totalPages = this.totalPages,
     totalResults = this.totalResults,
 )
 
-fun SeriesResponse.mapToEntity() = Series(
+fun SeriesResponse.mapToSeries() = Series(
     id = id,
     posterPath = posterPath,
     overview = overview,
@@ -28,7 +28,7 @@ fun SeriesResponse.mapToEntity() = Series(
     voteCount = voteCount,
 )
 
-fun SeriesResponse.mapToDto(category: String) = SeriesDto(
+fun SeriesResponse.mapToSeriesEntity(category: String) = SeriesEntity(
     id = id,
     posterPath = posterPath,
     overview = overview,
@@ -43,7 +43,7 @@ fun SeriesResponse.mapToDto(category: String) = SeriesDto(
     category = category,
 )
 
-fun SeriesDto.mapToEntity() = Series(
+fun SeriesEntity.mapToSeries() = Series(
     id = id,
     posterPath = posterPath,
     overview = overview,

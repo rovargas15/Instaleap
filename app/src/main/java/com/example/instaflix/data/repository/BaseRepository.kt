@@ -13,9 +13,7 @@ open class BaseRepository {
     inline fun <T, R> T.launchSafe(block: T.() -> R): Result<R> {
         return runCatching {
             block()
-        }.onFailure {
-            Result.failure<R>(getDomainException(it))
-        }
+        }.onFailure()
     }
 
     /**
@@ -24,15 +22,19 @@ open class BaseRepository {
      * and getDomainNativeException to convert the appropriate
      * type of exception to a domain exception.
      */
-    fun getDomainException(error: Throwable): DomainException {
-        return when (error) {
-            is retrofit2.HttpException -> {
-                getDomainExceptionFromRetrofitException(error)
-            }
+    fun <T> Result<T>.onFailure(): Result<T> {
+        return exceptionOrNull()?.let { error ->
+            when (error) {
+                is retrofit2.HttpException -> {
+                    Result.failure(getDomainExceptionFromRetrofitException(error))
+                }
 
-            else -> {
-                getDomainExceptionFromNativeException(error)
+                else -> {
+                    Result.failure(getDomainExceptionFromNativeException(error))
+                }
             }
+        } ?: run {
+            return this
         }
     }
 

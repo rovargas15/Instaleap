@@ -1,10 +1,10 @@
 package com.example.instaflix.data.repository
 
 import com.example.instaflix.data.local.db.FilmDao
-import com.example.instaflix.data.mapper.mapToDto
-import com.example.instaflix.data.mapper.mapToEntity
+import com.example.instaflix.data.mapper.mapToBaseResult
+import com.example.instaflix.data.mapper.mapToFilmEntity
+import com.example.instaflix.data.mapper.mapToFilms
 import com.example.instaflix.data.remote.api.FilmApi
-import com.example.instaflix.data.remote.model.BaseResponse
 import com.example.instaflix.data.remote.model.FilmResponse
 import com.example.instaflix.domain.model.BaseResult
 import com.example.instaflix.domain.model.Film
@@ -19,21 +19,20 @@ class FilmRepositoryImpl(
 
     override suspend fun getFilms(category: String): Result<BaseResult<Film>> = launchSafe {
         val response = api.getFilms(category)
-        insertFilms(response, category)
-        response.mapToEntity()
+        insertFilms(response.results, category)
+        response.mapToBaseResult()
     }
 
     override fun getLocalFilms(category: String): Flow<Result<List<Film>>> =
         filmDao.getAll(category).map { result ->
-            Result.success(result.mapToEntity())
+            Result.success(result.mapToFilms())
         }
 
     override fun getFilmById(id: Long) = filmDao.getFilmById(id).map { result ->
-        Result.success(result.mapToEntity())
+        Result.success(result.mapToBaseResult())
     }
 
-    override fun insertFilms(films: BaseResponse<FilmResponse>, category: String) =
-        filmDao.insertFilms(
-            films.mapToDto(category).results,
-        )
+    override fun insertFilms(films: List<FilmResponse>, category: String) = filmDao.insertFilms(
+        films.mapToFilmEntity(category),
+    )
 }

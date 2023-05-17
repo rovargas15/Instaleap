@@ -1,10 +1,10 @@
 package com.example.instaflix.data.repository
 
 import com.example.instaflix.data.local.db.SeriesDao
-import com.example.instaflix.data.mapper.mapToDto
-import com.example.instaflix.data.mapper.mapToEntity
+import com.example.instaflix.data.mapper.mapToBaseResult
+import com.example.instaflix.data.mapper.mapToSeries
+import com.example.instaflix.data.mapper.mapToSeriesEntity
 import com.example.instaflix.data.remote.api.SeriesApi
-import com.example.instaflix.data.remote.model.BaseResponse
 import com.example.instaflix.data.remote.model.SeriesResponse
 import com.example.instaflix.domain.model.BaseResult
 import com.example.instaflix.domain.model.Series
@@ -18,22 +18,22 @@ class SeriesRepositoryImpl(
 
     override suspend fun getSeries(category: String): Result<BaseResult<Series>> = launchSafe {
         val response = api.getSeries(category)
-        insertSeries(response, category)
-        response.mapToEntity()
+        insertSeries(response.results, category)
+        response.mapToBaseResult()
     }
 
     override fun getLocalSeries(category: String) = seriesDao.getAllSeries(category).map { result ->
-        Result.success(result.map { it.mapToEntity() })
+        Result.success(result.map { it.mapToSeries() })
     }
 
     override fun getSeriesById(seriesId: Long) = seriesDao.getSeriesById(seriesId).map { result ->
-        Result.success(result.mapToEntity())
+        Result.success(result.mapToSeries())
     }
 
-    override fun insertSeries(series: BaseResponse<SeriesResponse>, category: String) {
+    override fun insertSeries(series: List<SeriesResponse>, category: String) {
         seriesDao.insertSeries(
-            series.results.map {
-                it.mapToDto(category)
+            series.map {
+                it.mapToSeriesEntity(category)
             },
         )
     }

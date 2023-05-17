@@ -5,17 +5,17 @@ sealed class DomainException(
     cause: Throwable? = null,
 ) : Throwable(message, cause)
 
-class PermissionDeniedException(
-    message: String? = null,
-    cause: Throwable? = null,
+data class PermissionDeniedException(
+    override val message: String? = null,
+    override val cause: Throwable? = null,
 ) : DomainException(message, cause)
 
-class UnknowException(
-    message: String? = null,
-    cause: Throwable? = null,
+data class UnknowException(
+    override val message: String? = null,
+    override val cause: Throwable? = null,
 ) : DomainException(message, cause)
 
-class InternetException(
-    message: String? = null,
-    cause: Throwable? = null,
+data class InternetException(
+    override val message: String? = null,
+    override val cause: Throwable? = null,
 ) : DomainException(message, cause)

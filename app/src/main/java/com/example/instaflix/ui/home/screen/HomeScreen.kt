@@ -3,14 +3,12 @@ package com.example.instaflix.ui.home.screen
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedCard
@@ -18,7 +16,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -64,15 +61,11 @@ fun HomeScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
-        topBar = { AppTopBar() },
         snackbarHost = {
-            // reuse default SnackbarHost to have default animation and timing handling
             SimpleSnackbar(snackbarHostState)
         },
         bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.primary,
-            ) {
+            NavigationBar {
                 BottomBar(navController, backStackEntry)
             }
         },
@@ -96,19 +89,6 @@ fun HomeScreen(
                     )
                 }
             }
-        },
-    )
-}
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun AppTopBar() {
-    TopAppBar(
-        title = {
-            Text(
-                LocalContext.current.getString(R.string.app_name),
-                modifier = Modifier.fillMaxWidth(),
-            )
         },
     )
 }
