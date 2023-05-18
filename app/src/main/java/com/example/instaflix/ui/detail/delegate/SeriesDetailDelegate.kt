@@ -6,9 +6,7 @@ import com.example.instaflix.ui.detail.state.SeriesUiState
 import com.example.instaflix.ui.home.state.FilmsNowPlayingUiState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class SeriesDetailDelegate(
     initialState: SeriesUiState,
@@ -20,8 +18,8 @@ class SeriesDetailDelegate(
     override fun createInitialState() = FilmsNowPlayingUiState(isLoading = true)
 
     fun fetchData(id: Long) {
-        getSeriesByIdUC.invoke(id).map { result ->
-            result.fold(
+        viewModelScope.launch(coroutineDispatcher) {
+            getSeriesByIdUC.invoke(id).fold(
                 onSuccess = { series ->
                     setState { copy(series = series, isLoading = false) }
                 },
@@ -29,6 +27,6 @@ class SeriesDetailDelegate(
                     setState { copy(isLoading = false, errorObject = Pair(true, error.message)) }
                 },
             )
-        }.flowOn(coroutineDispatcher).launchIn(viewModelScope)
+        }
     }
 }

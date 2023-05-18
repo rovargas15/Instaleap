@@ -1,16 +1,15 @@
 package com.example.instaflix.data.repository
 
 import com.example.instaflix.BaseTest
-import com.example.instaflix.data.local.db.SeriesDao
-import com.example.instaflix.data.local.dto.SeriesEntity
+import com.example.instaflix.data.dataSource.LocalSeriesDataSource
+import com.example.instaflix.data.dataSource.RemoteSeriesDataSource
 import com.example.instaflix.data.mapper.mapToBaseResult
-import com.example.instaflix.data.mapper.mapToSeries
-import com.example.instaflix.data.mapper.mapToSeriesEntity
-import com.example.instaflix.data.remote.api.SeriesApi
 import com.example.instaflix.data.remote.model.BaseResponse
 import com.example.instaflix.data.remote.model.SeriesResponse
+import com.example.instaflix.domain.exception.PermissionDeniedException
 import com.example.instaflix.domain.exception.UnknowException
 import com.example.instaflix.domain.model.BaseResult
+import com.example.instaflix.domain.model.Film
 import com.example.instaflix.domain.model.Series
 import com.example.instaflix.domain.repository.SeriesRepository
 import io.mockk.coEvery
@@ -24,19 +23,22 @@ import io.mockk.mockkStatic
 import io.mockk.runs
 import io.mockk.verify
 import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
+import retrofit2.HttpException
+import java.net.ConnectException
+import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 class SeriesRepositoryImplTest : BaseTest() {
 
     @MockK
-    lateinit var api: SeriesApi
+    lateinit var remoteSeriesDataSource: RemoteSeriesDataSource
 
     @MockK
-    lateinit var seriesDao: SeriesDao
+    lateinit var localSeriesDataSource: LocalSeriesDataSource
 
     private lateinit var repository: SeriesRepository
 
@@ -44,145 +46,206 @@ class SeriesRepositoryImplTest : BaseTest() {
     override fun setup() {
         super.setup()
         repository = SeriesRepositoryImpl(
-            api = api,
-            seriesDao = seriesDao,
+            remoteSeriesDataSource = remoteSeriesDataSource,
+            localSeriesDataSource = localSeriesDataSource,
         )
     }
 
     @Test
     fun `give category, when getSeries is called, then return success result`() = runBlocking {
         // Given
-        val category = "action"
-        val seriesResponse: SeriesResponse = mockk()
         val baseResponse: BaseResponse<SeriesResponse> = mockk()
-        val expectedSeriesEntity: SeriesEntity = mockk()
         val expectedBaseResult: BaseResult<Series> = mockk()
+        val seriesResponse: List<SeriesResponse> = mockk()
+        val expectedSeries: List<Series> = mockk()
+        val category = "action"
 
         mockkStatic(baseResponse::mapToBaseResult)
-        mockkStatic(seriesResponse::mapToSeries)
 
-        coEvery { api.getSeries(category) } returns baseResponse
-        coEvery { seriesDao.insertSeries(listOf(expectedSeriesEntity)) } returns Unit
-
-        every { baseResponse.results } returns listOf(seriesResponse)
+        every { baseResponse.results } returns seriesResponse
         every { baseResponse.mapToBaseResult() } returns expectedBaseResult
-        every { seriesResponse.mapToSeriesEntity(category) } returns expectedSeriesEntity
+        every { expectedBaseResult.results } returns expectedSeries
+
+        coEvery { remoteSeriesDataSource.getSeries(category) } returns baseResponse
+        coEvery {
+            localSeriesDataSource.insertSeries(seriesResponse, category)
+        } just runs
 
         // When
-        val result = repository.getSeries(category)
+        val result = repository.getSeries(category).getOrNull()
 
         // Then
-        assertEquals(Result.success(expectedBaseResult), result)
+        assertEquals(expectedSeries, result)
         coVerify {
-            api.getSeries(category)
-            seriesDao.insertSeries(listOf(expectedSeriesEntity))
+            remoteSeriesDataSource.getSeries(category)
+            localSeriesDataSource.insertSeries(seriesResponse, category)
         }
         verify {
             baseResponse.results
             baseResponse.mapToBaseResult()
-            seriesResponse.mapToSeriesEntity(category)
+            expectedBaseResult.results
         }
-        confirmVerified(api, seriesDao)
+        confirmVerified(remoteSeriesDataSource, localSeriesDataSource)
     }
 
     @Test
-    fun `give exception, when getSeries is called, then return failed`() = runBlocking {
+    fun `give HttpException HTTP_UNAUTHORIZED, when getSeries is called, then return failed result PermissionDeniedException`() =
+        runBlocking {
+            // Given
+            val error: HttpException = mockk()
+            val category = "action"
+
+            every { error.code() } returns HttpURLConnection.HTTP_UNAUTHORIZED
+            coEvery { remoteSeriesDataSource.getSeries(category) } throws error
+
+            // When
+            val result = repository.getSeries(category)
+
+            // Then
+            assertEquals(Result.failure<BaseResult<Film>>(PermissionDeniedException()), result)
+            coVerify {
+                remoteSeriesDataSource.getSeries(category)
+            }
+            confirmVerified(remoteSeriesDataSource)
+        }
+
+    @Test
+    fun `give Exception, when insertSeries is called, then return failed result UnknowException`() =
+        runBlocking {
+            // Given
+            val seriesResponse: List<SeriesResponse> = mockk()
+            val baseResponse: BaseResponse<SeriesResponse> = mockk()
+            val category = "action"
+
+            mockkStatic(baseResponse::mapToBaseResult)
+
+            coEvery { remoteSeriesDataSource.getSeries(category) } returns baseResponse
+            coEvery {
+                localSeriesDataSource.insertSeries(
+                    seriesResponse,
+                    category,
+                )
+            } throws Throwable()
+            every { baseResponse.results } returns seriesResponse
+
+            // When
+            val result = repository.getSeries(category)
+
+            // Then
+            assertEquals(Result.failure<BaseResult<Film>>(UnknowException()), result)
+            coVerify {
+                remoteSeriesDataSource.getSeries(category)
+                localSeriesDataSource.insertSeries(seriesResponse, category)
+            }
+            confirmVerified(remoteSeriesDataSource, localSeriesDataSource)
+        }
+
+    @Test
+    fun `give HttpException HTTP_FORBIDDEN, when getSeries is called, then return failed result PermissionDeniedException`() =
+        runBlocking {
+            // Given
+            val error: HttpException = mockk()
+            val category = "action"
+
+            every { error.code() } returns HttpURLConnection.HTTP_FORBIDDEN
+            coEvery { remoteSeriesDataSource.getSeries(category) } throws error
+
+            // When
+            val result = repository.getSeries(category)
+
+            // Then
+            assertEquals(Result.failure<BaseResult<Film>>(PermissionDeniedException()), result)
+            coVerify {
+                remoteSeriesDataSource.getSeries(category)
+            }
+            confirmVerified(remoteSeriesDataSource)
+        }
+
+    @Test
+    fun `give SocketTimeoutException, when getSeries is called, then result Success`() =
+        runBlocking {
+            // Given
+            val error: SocketTimeoutException = mockk()
+            val category = "action"
+            val series: List<Series> = mockk()
+
+            coEvery { remoteSeriesDataSource.getSeries(category) } throws error
+            coEvery { localSeriesDataSource.getAllSeries(category) } returns series
+
+            // When
+            val result = repository.getSeries(category).getOrNull()
+
+            // Then
+            assertEquals(series, result)
+            coVerify {
+                remoteSeriesDataSource.getSeries(category)
+                localSeriesDataSource.getAllSeries(category)
+            }
+            confirmVerified(remoteSeriesDataSource, localSeriesDataSource)
+        }
+
+    @Test
+    fun `give ConnectException, when getSeries is called, then return result Success`() =
+        runBlocking {
+            // Given
+            val error: ConnectException = mockk()
+            val category = "action"
+            val series: List<Series> = mockk()
+
+            coEvery { remoteSeriesDataSource.getSeries(category) } throws error
+            coEvery { localSeriesDataSource.getAllSeries(category) } returns series
+
+            // When
+            val result = repository.getSeries(category).getOrNull()
+
+            // Then
+            assertEquals(series, result)
+            coVerify {
+                remoteSeriesDataSource.getSeries(category)
+                localSeriesDataSource.getAllSeries(category)
+            }
+            confirmVerified(remoteSeriesDataSource, localSeriesDataSource)
+        }
+
+    @Test
+    fun `give UnknownHostException, when getSeries is called, then result Success`() = runBlocking {
         // Given
+        val error: UnknownHostException = mockk()
         val category = "action"
-        val seriesResponse: SeriesResponse = mockk()
-        val baseResponse: BaseResponse<SeriesResponse> = mockk()
-        val expectedSeriesEntity: SeriesEntity = mockk()
+        val series: List<Series> = mockk()
 
-        mockkStatic(baseResponse::mapToBaseResult)
-        mockkStatic(seriesResponse::mapToSeries)
-
-        coEvery { api.getSeries(category) } returns baseResponse
-
-        every { baseResponse.results } returns listOf(seriesResponse)
-        every { seriesResponse.mapToSeriesEntity(category) } returns expectedSeriesEntity
+        coEvery { remoteSeriesDataSource.getSeries(category) } throws error
+        coEvery { localSeriesDataSource.getAllSeries(category) } returns series
 
         // When
-        val result = repository.getSeries(category)
+        val result = repository.getSeries(category).getOrNull()
 
         // Then
-        assertEquals(Result.failure<BaseResult<Series>>(UnknowException()), result)
+        assertEquals(series, result)
         coVerify {
-            api.getSeries(category)
-            seriesDao.insertSeries(listOf(expectedSeriesEntity))
+            remoteSeriesDataSource.getSeries(category)
+            localSeriesDataSource.getAllSeries(category)
         }
-        verify {
-            baseResponse.results
-            seriesResponse.mapToSeriesEntity(category)
-        }
-        confirmVerified(api, seriesDao)
+        confirmVerified(remoteSeriesDataSource, localSeriesDataSource)
     }
 
     @Test
-    fun `give category, when getLocalSeries is called, then return success result`() = runBlocking {
-        // Given
-        val category = "action"
-        val seriesEntity: SeriesEntity = mockk()
-        val expectedResults: Series = mockk()
+    fun `give Exception, when getSeries is called, then return failed result UnknowException`() =
+        runBlocking {
+            // Given
+            val error: Exception = mockk()
+            val category = "action"
 
-        mockkStatic(seriesEntity::mapToSeries)
+            coEvery { remoteSeriesDataSource.getSeries(category) } throws error
 
-        every { seriesDao.getAllSeries(category) } returns flowOf(listOf(seriesEntity))
-        every { seriesEntity.mapToSeries() } returns expectedResults
+            // When
+            val result = repository.getSeries(category)
 
-        // When
-        val resultFlow = repository.getLocalSeries(category).single()
-
-        // Then
-        assertEquals(Result.success(listOf(expectedResults)), resultFlow)
-        verify {
-            seriesDao.getAllSeries(category)
-            seriesEntity.mapToSeries()
+            // Then
+            assertEquals(Result.failure<BaseResult<Film>>(UnknowException()), result)
+            coVerify {
+                remoteSeriesDataSource.getSeries(category)
+            }
+            confirmVerified(remoteSeriesDataSource)
         }
-        confirmVerified(seriesDao)
-    }
-
-    @Test
-    fun `give seriesId, when getSeriesById is called, then return success result`() = runBlocking {
-        // Given
-        val seriesId = 1L
-        val seriesEntity: SeriesEntity = mockk()
-        val expectedSeries: Series = mockk()
-
-        mockkStatic(seriesEntity::mapToSeries)
-        every { seriesDao.getSeriesById(seriesId) } returns flowOf(seriesEntity)
-        every { seriesEntity.mapToSeries() } returns expectedSeries
-
-        // When
-        val resultFlow = repository.getSeriesById(seriesId).single()
-
-        // Then
-        assertEquals(Result.success(expectedSeries), resultFlow)
-        verify {
-            seriesDao.getSeriesById(seriesId)
-            seriesEntity.mapToSeries()
-        }
-        confirmVerified(seriesDao)
-    }
-
-    @Test
-    fun `when insertSeries is called, then call seriesDao insertSeries`() = runBlocking {
-        // Given
-        val category = "action"
-        val seriesResponse: SeriesResponse = mockk()
-        val expectedSeriesEntity: SeriesEntity = mockk()
-
-        mockkStatic(seriesResponse::mapToSeriesEntity)
-        every { seriesResponse.mapToSeriesEntity(category) } returns expectedSeriesEntity
-        every { seriesDao.insertSeries(listOf(expectedSeriesEntity)) } just runs
-
-        // When
-        repository.insertSeries(listOf(seriesResponse), category)
-
-        // Then
-        verify {
-            seriesDao.insertSeries(listOf(expectedSeriesEntity))
-            seriesResponse.mapToSeriesEntity(category)
-        }
-        confirmVerified(seriesDao)
-    }
 }

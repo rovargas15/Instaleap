@@ -7,9 +7,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -17,6 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.instaflix.domain.model.Film
+import com.example.instaflix.ui.common.ContentError
 import com.example.instaflix.ui.common.FilmPoster
 import com.example.instaflix.ui.home.viewmodel.HomeFilmViewModel
 import com.example.instaflix.ui.theme.LocalDimensions
@@ -24,36 +26,38 @@ import com.example.instaflix.ui.theme.LocalDimensions
 @Composable
 fun HomeContentMovie(
     homeFilmViewModel: HomeFilmViewModel,
-    snackbarHostState: SnackbarHostState,
     onSelectedItem: ((id: Long) -> Unit)?,
+    onRetry: (() -> Unit),
 ) {
-    val upcomingState = homeFilmViewModel.upcomingFilmState
-    val filmNowPlayingState = homeFilmViewModel.filmNowPlayingState
-    val popularFilmsState = homeFilmViewModel.popularFilmsState
+    val upcomingState by homeFilmViewModel.upcomingFilmState.collectAsState()
+    val filmNowPlayingState by homeFilmViewModel.filmNowPlayingState.collectAsState()
+    val popularFilmsState by homeFilmViewModel.popularFilmsState.collectAsState()
 
-    CreateCategoryFilms(
+    CreateCategoryItem(
         state = upcomingState,
-        snackbarHostState = snackbarHostState,
         onSelectedItem = onSelectedItem,
+        onRetry = onRetry,
     )
-    CreateCategoryFilms(
+    CreateCategoryItem(
         state = filmNowPlayingState,
-        snackbarHostState = snackbarHostState,
         onSelectedItem = onSelectedItem,
+        onRetry = onRetry,
     )
-    CreateCategoryFilms(
+    CreateCategoryItem(
         state = popularFilmsState,
-        snackbarHostState = snackbarHostState,
         onSelectedItem = onSelectedItem,
+        onRetry = onRetry,
     )
 }
 
 @Composable
-fun CategoryFilms(
+fun FilmCategoryItem(
     categoryTitle: String,
-    films: List<Film>,
     isLoading: Boolean,
+    films: List<Film>,
+    isError: Boolean,
     onSelectedItem: ((id: Long) -> Unit)? = null,
+    onRetry: (() -> Unit),
 ) {
     Column(
         modifier = Modifier.padding(
@@ -68,16 +72,24 @@ fun CategoryFilms(
             modifier = Modifier.padding(start = LocalDimensions.current.paddingMedium),
         )
 
-        if (isLoading) {
-            LazyRow {
-                items(5) {
-                    FilmCard(isPlaceholder = true)
+        when {
+            isError -> {
+                ContentError(onRetry)
+            }
+
+            isLoading -> {
+                LazyRow {
+                    items(5) {
+                        CardItem(isPlaceholder = true)
+                    }
                 }
             }
-        } else {
-            LazyRow {
-                items(films) {
-                    FilmListItem(it, onSelectedItem)
+
+            else -> {
+                LazyRow {
+                    items(films) {
+                        FilmListItem(it, onSelectedItem)
+                    }
                 }
             }
         }
@@ -89,7 +101,7 @@ fun FilmListItem(
     film: Film,
     onSelectedItem: ((id: Long) -> Unit)? = null,
 ) {
-    FilmCard(
+    CardItem(
         onSelectedItem = { onSelectedItem?.invoke(film.id) },
     ) {
         Column {

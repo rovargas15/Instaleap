@@ -23,10 +23,9 @@ class OnTheAirSeriesDelegate(
         viewModelScope.launch(coroutineDispatcher) {
             getSeriesByCategoryUC.invoke(Category.ON_THE_AIR).fold(
                 onSuccess = { filmResult ->
-                    setState { copy(films = filmResult.results, isLoading = false) }
+                    setState { copy(seriesList = filmResult, isLoading = false) }
                 },
                 onFailure = { error ->
-
                     setState {
                         copy(
                             isLoading = false,

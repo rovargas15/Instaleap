@@ -2,8 +2,6 @@ package com.example.instaflix.domain.usecase
 
 import com.example.instaflix.BaseTest
 import com.example.instaflix.domain.exception.UnknowException
-import com.example.instaflix.domain.model.BaseResult
-import com.example.instaflix.domain.model.Film
 import com.example.instaflix.domain.model.Series
 import com.example.instaflix.domain.repository.SeriesRepository
 import io.mockk.coEvery
@@ -11,7 +9,7 @@ import io.mockk.coVerify
 import io.mockk.confirmVerified
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import junit.framework.TestCase
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
@@ -32,15 +30,15 @@ class GetSeriesByCategoryUCTest : BaseTest() {
         runBlocking {
             // Given
             val category = "action"
-            val response: BaseResult<Series> = mockk()
+            val response: List<Series> = mockk()
 
             coEvery { seriesRepository.getSeries(category) } returns Result.success(response)
 
             // When
-            val result = useCase.invoke(category)
+            val result = useCase.invoke(category).getOrNull()
 
             // Then
-            TestCase.assertEquals(Result.success(response), result)
+            assertEquals(response, result)
             coVerify {
                 seriesRepository.getSeries(category)
             }
@@ -57,10 +55,10 @@ class GetSeriesByCategoryUCTest : BaseTest() {
             coEvery { seriesRepository.getSeries(category) } returns Result.failure(error)
 
             // When
-            val result = useCase.invoke(category)
+            val result = useCase.invoke(category).exceptionOrNull()
 
             // Then
-            TestCase.assertEquals(Result.failure<BaseResult<Film>>(error), result)
+            assertEquals(error, result)
             coVerify {
                 seriesRepository.getSeries(category)
             }

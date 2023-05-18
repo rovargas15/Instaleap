@@ -36,8 +36,10 @@ class DetailFilmViewModel @Inject constructor(
         viewModelScope,
     )
 
-    val filmState get() = filmDelegate.getState()
-    val seriesState get() = seriesDelegate.getState()
+    val filmState: FilmUiState
+        get() = filmDelegate.viewState.value
+    val seriesState: SeriesUiState
+        get() = seriesDelegate.viewState.value
 
     fun onLoad() {
         savedStateHandle.get<String>(Parameter.FILM_ID)?.let { id ->

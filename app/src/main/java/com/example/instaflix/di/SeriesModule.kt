@@ -1,10 +1,11 @@
 package com.example.instaflix.di
 
+import com.example.instaflix.data.dataSource.LocalSeriesDataSource
+import com.example.instaflix.data.dataSource.RemoteSeriesDataSource
 import com.example.instaflix.data.local.db.SeriesDao
 import com.example.instaflix.data.remote.api.SeriesApi
 import com.example.instaflix.data.repository.SeriesRepositoryImpl
 import com.example.instaflix.domain.repository.SeriesRepository
-import com.example.instaflix.domain.usecase.GetLocalSeriesByCategoryUC
 import com.example.instaflix.domain.usecase.GetSeriesByCategoryUC
 import com.example.instaflix.domain.usecase.GetSeriesByIdUC
 import dagger.Module
@@ -28,14 +29,6 @@ object SeriesModule {
 
     @Provides
     @ViewModelScoped
-    fun getLocalSeriesByCategoryUCProvider(
-        seriesRepository: SeriesRepository,
-    ): GetLocalSeriesByCategoryUC = GetLocalSeriesByCategoryUC(
-        remoteRepository = seriesRepository,
-    )
-
-    @Provides
-    @ViewModelScoped
     fun getSeriesByIdUCProvider(
         seriesRepository: SeriesRepository,
     ): GetSeriesByIdUC = GetSeriesByIdUC(
@@ -45,11 +38,27 @@ object SeriesModule {
     @Provides
     @ViewModelScoped
     fun seriesRepositoryImplProvider(
-        api: SeriesApi,
-        seriesDao: SeriesDao,
+        localSeriesDataSource: LocalSeriesDataSource,
+        remoteSeriesDataSource: RemoteSeriesDataSource,
     ): SeriesRepository = SeriesRepositoryImpl(
+        localSeriesDataSource = localSeriesDataSource,
+        remoteSeriesDataSource = remoteSeriesDataSource,
+    )
+
+    @Provides
+    @ViewModelScoped
+    fun localSeriesDataSourceProvider(
+        dao: SeriesDao,
+    ): LocalSeriesDataSource = LocalSeriesDataSource(
+        seriesDao = dao,
+    )
+
+    @Provides
+    @ViewModelScoped
+    fun remoteSeriesDataSourceProvider(
+        api: SeriesApi,
+    ): RemoteSeriesDataSource = RemoteSeriesDataSource(
         api = api,
-        seriesDao = seriesDao,
     )
 
     @Provides

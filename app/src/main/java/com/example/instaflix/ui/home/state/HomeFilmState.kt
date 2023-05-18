@@ -38,7 +38,7 @@ data class PopularFilmsUiState(
 }
 
 data class TopRatedSeriesUiState(
-    val films: List<Series> = emptyList(),
+    val seriesList: List<Series> = emptyList(),
     val isLoading: Boolean = false,
     val errorObject: Pair<Boolean, String?>? = null,
 ) : UiState {
@@ -49,7 +49,7 @@ data class TopRatedSeriesUiState(
 }
 
 data class OnTheAirSeriesUiState(
-    val films: List<Series> = emptyList(),
+    val seriesList: List<Series> = emptyList(),
     val isLoading: Boolean = false,
     val errorObject: Pair<Boolean, String?>? = null,
 ) : UiState {
@@ -60,7 +60,7 @@ data class OnTheAirSeriesUiState(
 }
 
 data class PopularSeriesUiState(
-    val films: List<Series> = emptyList(),
+    val seriesList: List<Series> = emptyList(),
     val isLoading: Boolean = false,
     val errorObject: Pair<Boolean, String?>? = null,
 ) : UiState {

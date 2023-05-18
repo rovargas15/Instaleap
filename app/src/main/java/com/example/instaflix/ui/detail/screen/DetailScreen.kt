@@ -67,7 +67,7 @@ private fun ContentDetail(
     Box(modifier = Modifier.fillMaxSize()) {
         when (state) {
             is FilmUiState -> {
-                state.films?.let { DetailFilmConstraintLayout(it) }
+                state.film?.let { DetailFilmConstraintLayout(it) }
             }
 
             is SeriesUiState -> {

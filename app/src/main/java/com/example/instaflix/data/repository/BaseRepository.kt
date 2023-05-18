@@ -16,6 +16,16 @@ open class BaseRepository {
         }.onFailure()
     }
 
+    fun <T> Result<T>.recoverCatchingSafe(function: () -> T): Result<T> {
+        return recoverCatching {
+            if (it is InternetException) {
+                function.invoke()
+            } else {
+                throw it
+            }
+        }
+    }
+
     /**
      * The method getDomainException
      * uses methods getDomainExceptionFromRetrofitException
@@ -27,6 +37,10 @@ open class BaseRepository {
             when (error) {
                 is retrofit2.HttpException -> {
                     Result.failure(getDomainExceptionFromRetrofitException(error))
+                }
+
+                is UnknownHostException -> {
+                    Result.failure(InternetException())
                 }
 
                 else -> {

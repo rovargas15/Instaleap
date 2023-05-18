@@ -5,7 +5,7 @@ import com.example.instaflix.domain.model.Series
 import com.example.instaflix.ui.common.UiState
 
 data class FilmUiState(
-    val films: Film? = null,
+    val film: Film? = null,
     val isLoading: Boolean = false,
     val errorObject: Pair<Boolean, String?>? = null,
 ) : UiState {

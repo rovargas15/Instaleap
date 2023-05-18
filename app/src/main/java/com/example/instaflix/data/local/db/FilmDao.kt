@@ -5,17 +5,16 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.instaflix.data.local.dto.FilmEntity
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FilmDao {
 
     @Query("SELECT * from FilmEntity Where category == :category")
-    fun getAll(category: String): Flow<List<FilmEntity>>
+    fun getAllFilms(category: String): List<FilmEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertFilms(films: List<FilmEntity>)
 
     @Query("SELECT * from FilmEntity where  id == :filmId")
-    fun getFilmById(filmId: Long): Flow<FilmEntity>
+    fun getFilmById(filmId: Long): FilmEntity
 }

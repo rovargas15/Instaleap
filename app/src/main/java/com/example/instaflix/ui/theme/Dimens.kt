@@ -11,6 +11,7 @@ data class Dimens(
     val paddingXLarge: Dp = 16.dp,
     val borderSmall: Dp = 1.dp,
     val imageXSmall: Dp = 150.dp,
+    val imageXxSmall: Dp = 50.dp,
     val imageSmall: Dp = 230.dp,
     val imageMedium: Dp = 250.dp,
     val heightCard: Dp = 270.dp,

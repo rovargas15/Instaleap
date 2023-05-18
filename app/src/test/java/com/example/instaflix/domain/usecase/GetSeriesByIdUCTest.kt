@@ -10,9 +10,6 @@ import io.mockk.confirmVerified
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
@@ -35,13 +32,13 @@ class GetSeriesByIdUCTest : BaseTest() {
             val id = 1L
             val series: Series = mockk()
 
-            coEvery { seriesRepository.getSeriesById(id) } returns flowOf(Result.success(series))
+            coEvery { seriesRepository.getSeriesById(id) } returns Result.success(series)
 
             // When
-            val result = useCase.invoke(id).single()
+            val result = useCase.invoke(id).getOrNull()
 
             // Then
-            assertEquals(Result.success(series), result)
+            assertEquals(series, result)
             coVerify {
                 seriesRepository.getSeriesById(id)
             }
@@ -55,13 +52,13 @@ class GetSeriesByIdUCTest : BaseTest() {
             val id = 1L
             val error = UnknowException()
 
-            coEvery { seriesRepository.getSeriesById(id) } returns flowOf(Result.failure(error))
+            coEvery { seriesRepository.getSeriesById(id) } returns Result.failure(error)
 
             // When
-            val result = useCase.invoke(id).single()
+            val result = useCase.invoke(id).exceptionOrNull()
 
             // Then
-            assertEquals(Result.failure<Flow<Result<Series>>>(error), result)
+            assertEquals(error, result)
             coVerify {
                 seriesRepository.getSeriesById(id)
             }

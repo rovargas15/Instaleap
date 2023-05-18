@@ -2,7 +2,6 @@ package com.example.instaflix.domain.usecase
 
 import com.example.instaflix.BaseTest
 import com.example.instaflix.domain.exception.UnknowException
-import com.example.instaflix.domain.model.BaseResult
 import com.example.instaflix.domain.model.Film
 import com.example.instaflix.domain.repository.FilmRepository
 import io.mockk.coEvery
@@ -31,15 +30,15 @@ class GetFilmsByCategoryUCTest : BaseTest() {
         runBlocking {
             // Given
             val category = "action"
-            val response: BaseResult<Film> = mockk()
+            val response: List<Film> = mockk()
 
             coEvery { filmRepository.getFilms(category) } returns Result.success(response)
 
             // When
-            val result = useCase.invoke(category)
+            val result = useCase.invoke(category).getOrNull()
 
             // Then
-            assertEquals(Result.success(response), result)
+            assertEquals(response, result)
             coVerify {
                 filmRepository.getFilms(category)
             }
@@ -56,10 +55,10 @@ class GetFilmsByCategoryUCTest : BaseTest() {
             coEvery { filmRepository.getFilms(category) } returns Result.failure(error)
 
             // When
-            val result = useCase.invoke(category)
+            val result = useCase.invoke(category).exceptionOrNull()
 
             // Then
-            assertEquals(Result.failure<BaseResult<Film>>(error), result)
+            assertEquals(error, result)
             coVerify {
                 filmRepository.getFilms(category)
             }

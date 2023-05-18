@@ -13,7 +13,6 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -78,15 +77,21 @@ fun HomeScreen(
                 if (isMovie) {
                     HomeContentMovie(
                         homeFilmViewModel = homeFilmViewModel,
-                        snackbarHostState = snackbarHostState,
                         onSelectedItem = onSelectedItem,
-                    )
+                    ) {
+                        backStackEntry.value?.destination?.route?.let { route ->
+                            homeFilmViewModel.onLoad(route)
+                        }
+                    }
                 } else {
                     HomeContentSeries(
                         homeFilmViewModel = homeFilmViewModel,
-                        snackbarHostState = snackbarHostState,
                         onSelectedItem = onSelectedItem,
-                    )
+                    ) {
+                        backStackEntry.value?.destination?.route?.let { route ->
+                            homeFilmViewModel.onLoad(route)
+                        }
+                    }
                 }
             }
         },
@@ -127,74 +132,76 @@ private fun BottomBar(
 }
 
 @Composable
-fun CreateCategoryFilms(
+fun CreateCategoryItem(
     state: UiState,
-    snackbarHostState: SnackbarHostState,
     onSelectedItem: ((id: Long) -> Unit)? = null,
+    onRetry: (() -> Unit),
 ) {
-    val dismissLabel = LocalContext.current.getString(R.string.snackbar_button_dismiss)
-    if (state.isError()) {
-        LaunchedEffect(Unit) {
-            snackbarHostState.showSnackbar(
-                message = state.getErrorMessage(),
-                actionLabel = dismissLabel,
-                duration = SnackbarDuration.Short,
-            )
-        }
-    }
-
+    val isError: Boolean = state.isError()
     when (state) {
         is UpcomingUiState -> {
-            CategoryFilms(
+            FilmCategoryItem(
                 LocalContext.current.getString(R.string.title_upcoming),
-                state.films,
-                state.isLoading,
-                onSelectedItem,
+                isLoading = state.isLoading,
+                isError = isError,
+                films = state.films,
+                onSelectedItem = onSelectedItem,
+                onRetry = onRetry,
             )
         }
 
         is FilmsNowPlayingUiState -> {
-            CategoryFilms(
+            FilmCategoryItem(
                 LocalContext.current.getString(R.string.title_films_now_playing),
-                state.films,
-                state.isLoading,
-                onSelectedItem,
+                isLoading = state.isLoading,
+                isError = isError,
+                films = state.films,
+                onSelectedItem = onSelectedItem,
+                onRetry = onRetry,
             )
         }
 
         is PopularFilmsUiState -> {
-            CategoryFilms(
+            FilmCategoryItem(
                 LocalContext.current.getString(R.string.title_popular),
-                state.films,
-                state.isLoading,
-                onSelectedItem,
+                isLoading = state.isLoading,
+                isError = isError,
+                films = state.films,
+                onSelectedItem = onSelectedItem,
+                onRetry = onRetry,
             )
         }
 
         is PopularSeriesUiState -> {
-            CategorySeries(
-                LocalContext.current.getString(R.string.title_popular),
-                state.films,
-                state.isLoading,
-                onSelectedItem,
+            CategorySeriesItem(
+                categoryTitle = LocalContext.current.getString(R.string.title_popular),
+                series = state.seriesList,
+                isLoading = state.isLoading,
+                isError = isError,
+                onSelectedItem = onSelectedItem,
+                onRetry = onRetry,
             )
         }
 
         is TopRatedSeriesUiState -> {
-            CategorySeries(
-                LocalContext.current.getString(R.string.title_top_rated),
-                state.films,
-                state.isLoading,
-                onSelectedItem,
+            CategorySeriesItem(
+                categoryTitle = LocalContext.current.getString(R.string.title_top_rated),
+                series = state.seriesList,
+                isLoading = state.isLoading,
+                isError = isError,
+                onSelectedItem = onSelectedItem,
+                onRetry = onRetry,
             )
         }
 
         is OnTheAirSeriesUiState -> {
-            CategorySeries(
-                LocalContext.current.getString(R.string.title_on_the_air),
-                state.films,
-                state.isLoading,
-                onSelectedItem,
+            CategorySeriesItem(
+                categoryTitle = LocalContext.current.getString(R.string.title_on_the_air),
+                series = state.seriesList,
+                isLoading = state.isLoading,
+                isError = isError,
+                onSelectedItem = onSelectedItem,
+                onRetry = onRetry,
             )
         }
     }
@@ -202,7 +209,7 @@ fun CreateCategoryFilms(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FilmCard(
+fun CardItem(
     isPlaceholder: Boolean = false,
     onSelectedItem: (() -> Unit)? = null,
     content: (@Composable ColumnScope.() -> Unit)? = null,

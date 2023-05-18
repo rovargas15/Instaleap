@@ -1,9 +1,7 @@
 package com.example.instaflix.ui.common
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
 
 interface UiState {
     fun isError(): Boolean
@@ -15,14 +13,11 @@ abstract class ViewModelMVIHandler<state : UiState>(
     val viewModelScope: CoroutineScope,
 ) {
 
-    private val _viewState: MutableState<state> = mutableStateOf(initialState)
-    private val viewState: State<state> = _viewState
+    val viewState = MutableStateFlow(initialState)
 
     abstract fun createInitialState(): UiState
 
-    fun getState() = viewState.value
-
     fun setState(reducer: state.() -> state) {
-        _viewState.value = viewState.value.reducer()
+        viewState.value = viewState.value.reducer()
     }
 }

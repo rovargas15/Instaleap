@@ -23,7 +23,7 @@ class PopularSeriesDelegate(
         viewModelScope.launch(coroutineDispatcher) {
             getSeriesByCategoryUC.invoke(Category.POPULAR).fold(
                 onSuccess = { filmResult ->
-                    setState { copy(films = filmResult.results, isLoading = false) }
+                    setState { copy(seriesList = filmResult, isLoading = false) }
                 },
                 onFailure = { error ->
                     setState {

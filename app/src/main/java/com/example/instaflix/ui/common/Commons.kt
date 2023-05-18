@@ -1,10 +1,13 @@
 package com.example.instaflix.ui.common
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -35,6 +38,7 @@ fun CreateAnimation(
 ) {
     val composition by rememberLottieComposition(spec = raw)
     LottieAnimation(
+        alignment = Alignment.Center,
         composition = composition,
         iterations = LottieConstants.IterateForever,
         modifier = modifier.size(LocalDimensions.current.imageXSmall),
@@ -43,27 +47,37 @@ fun CreateAnimation(
 
 @Composable
 fun ContentError(onRetry: (() -> Unit)) {
-    Column(
-        modifier = Modifier.fillMaxSize().testTag("ContentError"),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(
-            LocalDimensions.current.paddingSmall,
-            alignment = Alignment.CenterVertically,
+    OutlinedCard(
+        modifier = Modifier.fillMaxWidth().testTag("ContentError").padding(
+            horizontal = LocalDimensions.current.paddingMedium,
+            vertical = LocalDimensions.current.paddingSmall,
         ),
     ) {
-        CreateAnimation(raw = LottieCompositionSpec.RawRes(R.raw.error))
-        Text(
-            text = stringResource(id = R.string.message_error),
-        )
-        TextButton(
-            onClick = {
-                onRetry.invoke()
-            },
-        ) {
-            Text(
-                text = stringResource(id = R.string.btn_retry),
-                fontWeight = FontWeight.Bold,
-            )
+        Box(modifier = Modifier.wrapContentWidth()) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(LocalDimensions.current.paddingMedium),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                CreateAnimation(
+                    raw = LottieCompositionSpec.RawRes(R.raw.error),
+                    Modifier.size(
+                        LocalDimensions.current.imageXSmall,
+                    ),
+                )
+                Text(
+                    text = stringResource(id = R.string.message_error),
+                )
+                TextButton(
+                    onClick = {
+                        onRetry.invoke()
+                    },
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.btn_retry),
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
         }
     }
 }

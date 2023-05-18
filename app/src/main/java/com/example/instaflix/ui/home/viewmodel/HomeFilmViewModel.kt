@@ -1,9 +1,9 @@
 package com.example.instaflix.ui.home.viewmodel
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.instaflix.domain.usecase.GetFilmsByCategoryUC
-import com.example.instaflix.domain.usecase.GetLocalFilmsByCategoryUC
 import com.example.instaflix.domain.usecase.GetSeriesByCategoryUC
 import com.example.instaflix.ui.home.delegate.FilmsNowPlayingDelegate
 import com.example.instaflix.ui.home.delegate.OnTheAirSeriesDelegate
@@ -20,22 +20,22 @@ import com.example.instaflix.ui.home.state.UpcomingUiState
 import com.example.instaflix.ui.utils.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeFilmViewModel @Inject constructor(
     getFilmsByCategoryUC: GetFilmsByCategoryUC,
     getSeriesByCategoryUC: GetSeriesByCategoryUC,
-    getLocalFilmsByCategoryUC: GetLocalFilmsByCategoryUC,
     coroutineDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
+
     /*
       Movie
      */
     private val upcomingDelegate = UpcomingFilmsDelegate(
         UpcomingUiState(isLoading = true),
         getFilmsByCategoryUC,
-        getLocalFilmsByCategoryUC,
         coroutineDispatcher,
         viewModelScope,
     )
@@ -43,7 +43,6 @@ class HomeFilmViewModel @Inject constructor(
     private val filmsNowPlayingDelegate = FilmsNowPlayingDelegate(
         FilmsNowPlayingUiState(isLoading = true),
         getFilmsByCategoryUC,
-        getLocalFilmsByCategoryUC,
         coroutineDispatcher,
         viewModelScope,
     )
@@ -51,14 +50,25 @@ class HomeFilmViewModel @Inject constructor(
     private val popularFilmsDelegate = PopularFilmsDelegate(
         PopularFilmsUiState(isLoading = true),
         getFilmsByCategoryUC,
-        getLocalFilmsByCategoryUC,
         coroutineDispatcher,
         viewModelScope,
     )
 
-    val upcomingFilmState get() = upcomingDelegate.getState()
-    val filmNowPlayingState get() = filmsNowPlayingDelegate.getState()
-    val popularFilmsState get() = popularFilmsDelegate.getState()
+    @VisibleForTesting
+    internal fun upcomingFilmMutableState() = upcomingDelegate.viewState
+
+    @VisibleForTesting
+    internal fun filmNowPlayingMutableState() = filmsNowPlayingDelegate.viewState
+
+    @VisibleForTesting
+    internal fun popularFilmsMutableState() = popularFilmsDelegate.viewState
+
+    val upcomingFilmState: StateFlow<UpcomingUiState>
+        get() = upcomingFilmMutableState()
+    val filmNowPlayingState: StateFlow<FilmsNowPlayingUiState>
+        get() = filmNowPlayingMutableState()
+    val popularFilmsState: StateFlow<PopularFilmsUiState>
+        get() = popularFilmsMutableState()
 
     /*
       Series
@@ -84,9 +94,21 @@ class HomeFilmViewModel @Inject constructor(
         viewModelScope,
     )
 
-    val popularSeriesState get() = popularSeriesDelegate.getState()
-    val topRatedSeriesPlayingState get() = topRatedSeriesDelegate.getState()
-    val onTheAirSeriesState get() = onTheAirSeriesDelegate.getState()
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal fun popularSeriesMutableState() = popularSeriesDelegate.viewState
+
+    @VisibleForTesting
+    internal fun topRatedSeriesMutableState() = topRatedSeriesDelegate.viewState
+
+    @VisibleForTesting
+    internal fun onTheAirSeriesMutableState() = onTheAirSeriesDelegate.viewState
+
+    val popularSeriesState: StateFlow<PopularSeriesUiState>
+        get() = popularSeriesMutableState()
+    val topRatedSeriesState: StateFlow<TopRatedSeriesUiState>
+        get() = topRatedSeriesMutableState()
+    val onTheAirSeriesState: StateFlow<OnTheAirSeriesUiState>
+        get() = onTheAirSeriesMutableState()
 
     private fun onLoadMovie() {
         upcomingDelegate.fetchData()

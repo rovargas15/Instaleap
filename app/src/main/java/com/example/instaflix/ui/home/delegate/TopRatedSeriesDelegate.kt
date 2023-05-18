@@ -1,6 +1,5 @@
 package com.example.instaflix.ui.home.delegate
 
-import android.util.Log
 import com.example.instaflix.domain.usecase.GetSeriesByCategoryUC
 import com.example.instaflix.ui.common.ViewModelMVIHandler
 import com.example.instaflix.ui.home.state.TopRatedSeriesUiState
@@ -24,11 +23,9 @@ class TopRatedSeriesDelegate(
         viewModelScope.launch(coroutineDispatcher) {
             getSeriesByCategoryUC.invoke(Category.TOP_rated).fold(
                 onSuccess = { filmResult ->
-                    setState { copy(films = filmResult.results, isLoading = false) }
+                    setState { copy(seriesList = filmResult, isLoading = false) }
                 },
                 onFailure = { error ->
-                    Log.e("error->>", "${error.message}")
-
                     setState {
                         copy(
                             isLoading = false,
