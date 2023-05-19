@@ -83,3 +83,7 @@ Url base: https://api.themoviedb.org/3
 * [Retrofit](https://github.com/square/retrofit)
 * [Moshi](https://github.com/square/moshi)
 * [Hilt](https://github.com/googlecodelabs/android-hilt)
+
+## ScreenShot
+![Movies](Screenshot_20230519_153853.png)
+![Series](Screenshot_20230519_153904.png)
