@@ -7,8 +7,8 @@ import com.example.instaflix.domain.model.Film
 import com.example.instaflix.domain.model.Series
 import com.example.instaflix.domain.usecase.GetFilmsByCategoryUC
 import com.example.instaflix.domain.usecase.GetSeriesByCategoryUC
-import com.example.instaflix.ui.home.state.FilmsNowPlayingUiState
-import com.example.instaflix.ui.home.state.OnTheAirSeriesUiState
+import com.example.instaflix.domain.usecase.UpdateFilmsDataUC
+import com.example.instaflix.domain.usecase.UpdateSeriesDataUC
 import com.example.instaflix.ui.home.state.PopularFilmsUiState
 import com.example.instaflix.ui.home.state.PopularSeriesUiState
 import com.example.instaflix.ui.home.state.TopRatedSeriesUiState
@@ -20,6 +20,7 @@ import io.mockk.confirmVerified
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import org.junit.Rule
@@ -39,6 +40,12 @@ class HomeFilmViewModelTest : BaseTest() {
     @MockK
     lateinit var getSeriesByCategoryUC: GetSeriesByCategoryUC
 
+    @MockK
+    lateinit var updateFilmsDataUC: UpdateFilmsDataUC
+
+    @MockK
+    lateinit var updateSeriesDataUC: UpdateSeriesDataUC
+
     private lateinit var viewModel: HomeFilmViewModel
 
     override fun setup() {
@@ -46,6 +53,8 @@ class HomeFilmViewModelTest : BaseTest() {
         viewModel = HomeFilmViewModel(
             getFilmsByCategoryUC = getFilmsByCategoryUC,
             getSeriesByCategoryUC = getSeriesByCategoryUC,
+            updateFilmsDataUC = updateFilmsDataUC,
+            updateSeriesDataUC = updateSeriesDataUC,
             coroutineDispatcher = mainDispatcherRule.testDispatcher,
         )
     }
@@ -56,21 +65,17 @@ class HomeFilmViewModelTest : BaseTest() {
             // Give
             val films = mockk<List<Film>>()
 
-            coEvery { getFilmsByCategoryUC.invoke(any()) } returns Result.success(films)
+            coEvery { getFilmsByCategoryUC.invoke(any()) } returns flowOf(Result.success(films))
 
             // When
             viewModel.onLoad(Route.FILM)
 
             // Then
             val resultsPopular = mutableListOf<PopularFilmsUiState>()
-            val resultsNowPlaying = mutableListOf<FilmsNowPlayingUiState>()
             val resultsUpcoming = mutableListOf<UpcomingUiState>()
 
             val jobPopular = launch {
                 viewModel.popularFilmsMutableState().toList(resultsPopular)
-            }
-            val jobNowPlaying = launch {
-                viewModel.filmNowPlayingMutableState().toList(resultsNowPlaying)
             }
 
             val jobUpcoming = launch {
@@ -80,9 +85,6 @@ class HomeFilmViewModelTest : BaseTest() {
             assert(resultsPopular[0].isLoading)
             assertEquals(resultsPopular[1].films, films)
 
-            assert(resultsNowPlaying[0].isLoading)
-            assertEquals(resultsNowPlaying[1].films, films)
-
             assert(resultsUpcoming[0].isLoading)
             assertEquals(resultsUpcoming[1].films, films)
 
@@ -91,7 +93,6 @@ class HomeFilmViewModelTest : BaseTest() {
             }
             confirmVerified(getFilmsByCategoryUC)
             jobPopular.cancel()
-            jobNowPlaying.cancel()
             jobUpcoming.cancel()
         }
 
@@ -101,21 +102,17 @@ class HomeFilmViewModelTest : BaseTest() {
             // Give
             val error = UnsatisfiedLinkError()
 
-            coEvery { getFilmsByCategoryUC.invoke(any()) } returns Result.failure(error)
+            coEvery { getFilmsByCategoryUC.invoke(any()) } returns flowOf(Result.failure(error))
 
             // When
             viewModel.onLoad(Route.FILM)
 
             // Then
             val resultsPopular = mutableListOf<PopularFilmsUiState>()
-            val resultsNowPlaying = mutableListOf<FilmsNowPlayingUiState>()
             val resultsUpcoming = mutableListOf<UpcomingUiState>()
 
             val jobPopular = launch {
                 viewModel.popularFilmsMutableState().toList(resultsPopular)
-            }
-            val jobNowPlaying = launch {
-                viewModel.filmNowPlayingMutableState().toList(resultsNowPlaying)
             }
 
             val jobUpcoming = launch {
@@ -125,9 +122,6 @@ class HomeFilmViewModelTest : BaseTest() {
             assert(resultsPopular[0].isLoading)
             assert(resultsPopular[1].isError())
 
-            assert(resultsNowPlaying[0].isLoading)
-            assert(resultsNowPlaying[1].isError())
-
             assert(resultsUpcoming[0].isLoading)
             assert(resultsUpcoming[1].isError())
 
@@ -136,7 +130,6 @@ class HomeFilmViewModelTest : BaseTest() {
             }
             confirmVerified(getFilmsByCategoryUC)
             jobPopular.cancel()
-            jobNowPlaying.cancel()
             jobUpcoming.cancel()
         }
 
@@ -146,25 +139,20 @@ class HomeFilmViewModelTest : BaseTest() {
             // Give
             val series = mockk<List<Series>>()
 
-            coEvery { getSeriesByCategoryUC.invoke(any()) } returns Result.success(series)
+            coEvery { getSeriesByCategoryUC.invoke(any()) } returns flowOf(Result.success(series))
 
             // When
             viewModel.onLoad(Route.SERIES)
 
             // Then
-            // Then
             val resultsPopular = mutableListOf<PopularSeriesUiState>()
             val resultsTopRated = mutableListOf<TopRatedSeriesUiState>()
-            val resultsOnTheAir = mutableListOf<OnTheAirSeriesUiState>()
 
             val jobPopular = launch {
                 viewModel.popularSeriesMutableState().toList(resultsPopular)
             }
             val jobTopRated = launch {
                 viewModel.topRatedSeriesMutableState().toList(resultsTopRated)
-            }
-            val jobOnTheAir = launch {
-                viewModel.onTheAirSeriesMutableState().toList(resultsOnTheAir)
             }
 
             assert(resultsPopular[0].isLoading)
@@ -173,16 +161,12 @@ class HomeFilmViewModelTest : BaseTest() {
             assert(resultsTopRated[0].isLoading)
             assertEquals(resultsTopRated[1].seriesList, series)
 
-            assert(resultsOnTheAir[0].isLoading)
-            assertEquals(resultsOnTheAir[1].seriesList, series)
-
             coVerify() {
                 getSeriesByCategoryUC.invoke(any())
             }
             confirmVerified(getSeriesByCategoryUC)
             jobPopular.cancel()
             jobTopRated.cancel()
-            jobOnTheAir.cancel()
         }
 
     @Test
@@ -191,7 +175,7 @@ class HomeFilmViewModelTest : BaseTest() {
             // Give
             val error = UnsatisfiedLinkError()
 
-            coEvery { getSeriesByCategoryUC.invoke(any()) } returns Result.failure(error)
+            coEvery { getSeriesByCategoryUC.invoke(any()) } returns flowOf(Result.failure(error))
 
             // When
             viewModel.onLoad(Route.SERIES)
@@ -199,16 +183,12 @@ class HomeFilmViewModelTest : BaseTest() {
             // Then
             val resultsPopular = mutableListOf<PopularSeriesUiState>()
             val resultsTopRated = mutableListOf<TopRatedSeriesUiState>()
-            val resultsOnTheAir = mutableListOf<OnTheAirSeriesUiState>()
 
             val jobPopular = launch {
                 viewModel.popularSeriesMutableState().toList(resultsPopular)
             }
             val jobTopRated = launch {
                 viewModel.topRatedSeriesMutableState().toList(resultsTopRated)
-            }
-            val jobOnTheAir = launch {
-                viewModel.onTheAirSeriesMutableState().toList(resultsOnTheAir)
             }
 
             assert(resultsPopular[0].isLoading)
@@ -217,15 +197,11 @@ class HomeFilmViewModelTest : BaseTest() {
             assert(resultsTopRated[0].isLoading)
             assert(resultsTopRated[1].isError())
 
-            assert(resultsOnTheAir[0].isLoading)
-            assert(resultsOnTheAir[1].isError())
-
             coVerify() {
                 getSeriesByCategoryUC.invoke(any())
             }
             confirmVerified(getSeriesByCategoryUC)
             jobPopular.cancel()
             jobTopRated.cancel()
-            jobOnTheAir.cancel()
         }
 }

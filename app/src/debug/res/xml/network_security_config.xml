@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <domain-config>
+        <!-- Permitir conexiones a http://localhost:8080 -->
+        <domain includeSubdomains="true">localhost</domain>
+    </domain-config>
+    <domain-config>
+        <!-- Permitir conexiones a https://image.tmdb.org -->
+        <domain includeSubdomains="true">image.tmdb.org</domain>
+    </domain-config>
+</network-security-config>

@@ -10,6 +10,8 @@ import io.mockk.confirmVerified
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
@@ -32,10 +34,10 @@ class GetFilmsByCategoryUCTest : BaseTest() {
             val category = "action"
             val response: List<Film> = mockk()
 
-            coEvery { filmRepository.getFilms(category) } returns Result.success(response)
+            coEvery { filmRepository.getFilms(category) } returns flowOf(Result.success(response))
 
             // When
-            val result = useCase.invoke(category).getOrNull()
+            val result = useCase.invoke(category).single().getOrNull()
 
             // Then
             assertEquals(response, result)
@@ -52,10 +54,10 @@ class GetFilmsByCategoryUCTest : BaseTest() {
             val category = "action"
             val error = UnknowException()
 
-            coEvery { filmRepository.getFilms(category) } returns Result.failure(error)
+            coEvery { filmRepository.getFilms(category) } returns flowOf(Result.failure(error))
 
             // When
-            val result = useCase.invoke(category).exceptionOrNull()
+            val result = useCase.invoke(category).single().exceptionOrNull()
 
             // Then
             assertEquals(error, result)

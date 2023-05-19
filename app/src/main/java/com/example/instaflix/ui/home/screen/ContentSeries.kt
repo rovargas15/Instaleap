@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -30,18 +31,16 @@ fun HomeContentSeries(
     onRetry: (() -> Unit),
 ) {
     val popularSeriesState by homeFilmViewModel.popularSeriesState.collectAsState()
-    val onTheAirSeriesState by homeFilmViewModel.onTheAirSeriesState.collectAsState()
     val topRatedSeriesPlayingState by homeFilmViewModel.topRatedSeriesState.collectAsState()
 
-    CreateCategoryItem(popularSeriesState, onSelectedItem, onRetry = onRetry)
     CreateCategoryItem(
-        onTheAirSeriesState,
-        onSelectedItem,
+        state = popularSeriesState,
+        onSelectedItem = onSelectedItem,
         onRetry = onRetry,
     )
     CreateCategoryItem(
-        topRatedSeriesPlayingState,
-        onSelectedItem,
+        state = topRatedSeriesPlayingState,
+        onSelectedItem = onSelectedItem,
         onRetry = onRetry,
     )
 }
@@ -82,7 +81,9 @@ fun CategorySeriesItem(
             }
 
             else -> {
-                LazyRow {
+                LazyRow(
+                    state = rememberLazyListState(),
+                ) {
                     items(series) {
                         SeriesListItem(it, onSelectedItem)
                     }

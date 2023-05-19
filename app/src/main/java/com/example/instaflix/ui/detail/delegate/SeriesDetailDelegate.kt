@@ -3,7 +3,6 @@ package com.example.instaflix.ui.detail.delegate
 import com.example.instaflix.domain.usecase.GetSeriesByIdUC
 import com.example.instaflix.ui.common.ViewModelMVIHandler
 import com.example.instaflix.ui.detail.state.SeriesUiState
-import com.example.instaflix.ui.home.state.FilmsNowPlayingUiState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -15,7 +14,7 @@ class SeriesDetailDelegate(
     viewModelScope: CoroutineScope,
 ) : ViewModelMVIHandler<SeriesUiState>(initialState, viewModelScope) {
 
-    override fun createInitialState() = FilmsNowPlayingUiState(isLoading = true)
+    override fun createInitialState() = SeriesUiState(isLoading = true)
 
     fun fetchData(id: Long) {
         viewModelScope.launch(coroutineDispatcher) {

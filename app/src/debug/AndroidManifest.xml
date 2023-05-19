@@ -3,7 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.instaflix">
 
-    <application tools:ignore="MissingApplicationIcon">
+    <application
+        android:name=".ui.Instaflix"
+        tools:ignore="MissingApplicationIcon">
         <activity
             android:name=".HiltTestActivity"
             android:exported="false"

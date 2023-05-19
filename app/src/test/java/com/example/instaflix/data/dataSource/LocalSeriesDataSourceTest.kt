@@ -16,6 +16,8 @@ import io.mockk.mockkStatic
 import io.mockk.runs
 import io.mockk.verify
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -44,11 +46,11 @@ class LocalSeriesDataSourceTest : BaseTest() {
 
         mockkStatic(series::mapToSeries)
 
-        every { seriesDao.getAllSeries(category) } returns listOf(series)
+        every { seriesDao.getAllSeries(category) } returns flowOf(listOf(series))
         every { series.mapToSeries() } returns expectedResults
 
         // When
-        val result = dataSource.getAllSeries(category)
+        val result = dataSource.getAllSeries(category).single()
 
         // Then
         assertEquals(listOf(expectedResults), result)

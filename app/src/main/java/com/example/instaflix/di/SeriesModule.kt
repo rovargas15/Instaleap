@@ -8,6 +8,7 @@ import com.example.instaflix.data.repository.SeriesRepositoryImpl
 import com.example.instaflix.domain.repository.SeriesRepository
 import com.example.instaflix.domain.usecase.GetSeriesByCategoryUC
 import com.example.instaflix.domain.usecase.GetSeriesByIdUC
+import com.example.instaflix.domain.usecase.UpdateSeriesDataUC
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,6 +19,14 @@ import retrofit2.Retrofit
 @Module
 @InstallIn(ViewModelComponent::class)
 object SeriesModule {
+
+    @Provides
+    @ViewModelScoped
+    fun updateSeriesDataUCProvider(
+        seriesRepository: SeriesRepository,
+    ): UpdateSeriesDataUC = UpdateSeriesDataUC(
+        seriesRepository = seriesRepository,
+    )
 
     @Provides
     @ViewModelScoped

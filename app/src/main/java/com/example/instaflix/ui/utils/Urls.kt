@@ -25,14 +25,8 @@ object PATH {
 
 object Category {
     const val UPCOMING = "upcoming"
-    const val PLAYING_NOW = "now_playing"
     const val POPULAR = "popular"
     const val TOP_rated = "top_rated"
-    const val ON_THE_AIR = "on_the_air"
-}
-
-object Graph {
-    const val MAIN_GRAPH = "main_graph"
 }
 
 object Route {

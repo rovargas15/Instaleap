@@ -1,6 +1,7 @@
 package com.example.instaflix.di
 
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
@@ -58,12 +59,18 @@ object NetworkTestModule {
     fun retrofitProvider(
         client: OkHttpClient,
     ): Retrofit {
-        val moshi = Moshi.Builder().build()
-        return Retrofit.Builder().addConverterFactory(MoshiConverterFactory.create(moshi))
-            .client(client).baseUrl(MOCK_WEB_SERVER_URL).build()
+        val moshi = Moshi.Builder()
+            .addLast(KotlinJsonAdapterFactory())
+            .build()
+
+        return Retrofit.Builder()
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .client(client)
+            .baseUrl(MOCK_WEB_SERVER_URL)
+            .build()
     }
 }
 
 private const val TIME_OUT_SECONDS = 5L
 private const val MAX_REQUEST = 1
-private const val MOCK_WEB_SERVER_URL = "http://localhost:8080"
+private const val MOCK_WEB_SERVER_URL = "http://localhost:8080/test/"

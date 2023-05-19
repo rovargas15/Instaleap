@@ -5,22 +5,19 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,11 +25,8 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.instaflix.R
-import com.example.instaflix.ui.common.SimpleSnackbar
 import com.example.instaflix.ui.common.UiState
 import com.example.instaflix.ui.home.nav.BottomNavItem
-import com.example.instaflix.ui.home.state.FilmsNowPlayingUiState
-import com.example.instaflix.ui.home.state.OnTheAirSeriesUiState
 import com.example.instaflix.ui.home.state.PopularFilmsUiState
 import com.example.instaflix.ui.home.state.PopularSeriesUiState
 import com.example.instaflix.ui.home.state.TopRatedSeriesUiState
@@ -40,6 +34,7 @@ import com.example.instaflix.ui.home.state.UpcomingUiState
 import com.example.instaflix.ui.home.viewmodel.HomeFilmViewModel
 import com.example.instaflix.ui.theme.LocalDimensions
 import com.example.instaflix.ui.utils.Route
+import com.example.instaflix.ui.utils.Tag
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.placeholder.material.shimmer
@@ -51,18 +46,13 @@ fun HomeScreen(
     onSelectedItem: ((id: Long) -> Unit)? = null,
 ) {
     val backStackEntry: State<NavBackStackEntry?> = navController.currentBackStackEntryAsState()
+
     LaunchedEffect(Unit) {
         backStackEntry.value?.destination?.route?.let { route ->
             homeFilmViewModel.onLoad(route)
         }
     }
-
-    val snackbarHostState = remember { SnackbarHostState() }
-
     Scaffold(
-        snackbarHost = {
-            SimpleSnackbar(snackbarHostState)
-        },
         bottomBar = {
             NavigationBar {
                 BottomBar(navController, backStackEntry)
@@ -70,8 +60,7 @@ fun HomeScreen(
         },
         content = { paddingValue ->
             Column(
-                modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
-                    .padding(paddingValue),
+                modifier = Modifier.fillMaxSize().padding(paddingValue),
             ) {
                 val isMovie = Route.FILM == backStackEntry.value?.destination?.route
                 if (isMovie) {
@@ -79,18 +68,14 @@ fun HomeScreen(
                         homeFilmViewModel = homeFilmViewModel,
                         onSelectedItem = onSelectedItem,
                     ) {
-                        backStackEntry.value?.destination?.route?.let { route ->
-                            homeFilmViewModel.onLoad(route)
-                        }
+                        homeFilmViewModel.onLoad(Route.FILM)
                     }
                 } else {
                     HomeContentSeries(
                         homeFilmViewModel = homeFilmViewModel,
                         onSelectedItem = onSelectedItem,
                     ) {
-                        backStackEntry.value?.destination?.route?.let { route ->
-                            homeFilmViewModel.onLoad(route)
-                        }
+                        homeFilmViewModel.onLoad(Route.SERIES)
                     }
                 }
             }
@@ -141,18 +126,7 @@ fun CreateCategoryItem(
     when (state) {
         is UpcomingUiState -> {
             FilmCategoryItem(
-                LocalContext.current.getString(R.string.title_upcoming),
-                isLoading = state.isLoading,
-                isError = isError,
-                films = state.films,
-                onSelectedItem = onSelectedItem,
-                onRetry = onRetry,
-            )
-        }
-
-        is FilmsNowPlayingUiState -> {
-            FilmCategoryItem(
-                LocalContext.current.getString(R.string.title_films_now_playing),
+                stringResource(id = R.string.title_upcoming),
                 isLoading = state.isLoading,
                 isError = isError,
                 films = state.films,
@@ -193,17 +167,6 @@ fun CreateCategoryItem(
                 onRetry = onRetry,
             )
         }
-
-        is OnTheAirSeriesUiState -> {
-            CategorySeriesItem(
-                categoryTitle = LocalContext.current.getString(R.string.title_on_the_air),
-                series = state.seriesList,
-                isLoading = state.isLoading,
-                isError = isError,
-                onSelectedItem = onSelectedItem,
-                onRetry = onRetry,
-            )
-        }
     }
 }
 
@@ -216,7 +179,7 @@ fun CardItem(
 ) {
     OutlinedCard(
         onClick = { onSelectedItem?.invoke() },
-        modifier = Modifier.size(
+        modifier = Modifier.testTag(Tag.LOADER).size(
             LocalDimensions.current.minSizeCard,
             LocalDimensions.current.heightCard,
         ).padding(

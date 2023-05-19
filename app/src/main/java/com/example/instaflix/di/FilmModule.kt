@@ -8,6 +8,7 @@ import com.example.instaflix.data.repository.FilmRepositoryImpl
 import com.example.instaflix.domain.repository.FilmRepository
 import com.example.instaflix.domain.usecase.GetFilmsByCategoryUC
 import com.example.instaflix.domain.usecase.GetFilmsByIdUC
+import com.example.instaflix.domain.usecase.UpdateFilmsDataUC
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,6 +25,14 @@ object FilmModule {
     fun getFilmsByCategoryUCProvider(
         filmRepository: FilmRepository,
     ): GetFilmsByCategoryUC = GetFilmsByCategoryUC(
+        filmRepository = filmRepository,
+    )
+
+    @Provides
+    @ViewModelScoped
+    fun getFilmsUpdateDataUCProvider(
+        filmRepository: FilmRepository,
+    ): UpdateFilmsDataUC = UpdateFilmsDataUC(
         filmRepository = filmRepository,
     )
 

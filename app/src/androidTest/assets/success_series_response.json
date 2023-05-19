@@ -1,0 +1,47 @@
+{
+  "page": 1,
+  "results": [
+    {
+      "backdrop_path": "/mAJ84W6I8I272Da87qplS2Dp9ST.jpg",
+      "first_air_date": "2023-01-23",
+      "genre_ids": [
+        9648,
+        18
+      ],
+      "id": 202250,
+      "name": "Dirty Linen",
+      "origin_country": [
+        "PH"
+      ],
+      "original_language": "tl",
+      "original_name": "Dirty Linen",
+      "overview": "To exact vengeance, a young woman infiltrates the household of an influential family as a housemaid to expose their dirty secrets. However, love will get in the way of her revenge plot.",
+      "popularity": 2883.921,
+      "poster_path": "/aoAZgnmMzY9vVy9VWnO3U5PZENh.jpg",
+      "vote_average": 4.9,
+      "vote_count": 17
+    },
+    {
+      "backdrop_path": null,
+      "first_air_date": "2005-09-05",
+      "genre_ids": [
+        18,
+        35
+      ],
+      "id": 36361,
+      "name": "Ulice",
+      "origin_country": [
+        "CZ"
+      ],
+      "original_language": "cs",
+      "original_name": "Ulice",
+      "overview": "Ulice is a Czech soap opera produced and broadcast by Nova. In the Czech language Ulice means street.\n\nThe show describes the lives of the Farský, Jordán, Boháč, Nikl, and Liška families and many other people that live in Prague. Their daily battle against real problems of living in a modern world like divorce, love, betrayal and illness or disease. Ulice often shows crime.",
+      "popularity": 2707.186,
+      "poster_path": "/3ayWL13P1HeRnyVL9lU9flOdZjq.jpg",
+      "vote_average": 2.8,
+      "vote_count": 12
+    }
+  ],
+  "total_pages": 7466,
+  "total_results": 149315
+}

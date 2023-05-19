@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -30,16 +31,10 @@ fun HomeContentMovie(
     onRetry: (() -> Unit),
 ) {
     val upcomingState by homeFilmViewModel.upcomingFilmState.collectAsState()
-    val filmNowPlayingState by homeFilmViewModel.filmNowPlayingState.collectAsState()
     val popularFilmsState by homeFilmViewModel.popularFilmsState.collectAsState()
 
     CreateCategoryItem(
         state = upcomingState,
-        onSelectedItem = onSelectedItem,
-        onRetry = onRetry,
-    )
-    CreateCategoryItem(
-        state = filmNowPlayingState,
         onSelectedItem = onSelectedItem,
         onRetry = onRetry,
     )
@@ -86,7 +81,9 @@ fun FilmCategoryItem(
             }
 
             else -> {
-                LazyRow {
+                LazyRow(
+                    state = rememberLazyListState(),
+                ) {
                     items(films) {
                         FilmListItem(it, onSelectedItem)
                     }

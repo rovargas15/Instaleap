@@ -28,6 +28,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.instaflix.R
 import com.example.instaflix.ui.theme.LocalDimensions
+import com.example.instaflix.ui.utils.Tag
 import com.example.instaflix.ui.utils.UrlImage
 import com.example.instaflix.ui.utils.UrlImage.w300
 
@@ -86,7 +87,8 @@ fun ContentError(onRetry: (() -> Unit)) {
 fun FilmPoster(
     urlImage: String,
     size: String = w300,
-    modifier: Modifier = Modifier.height(LocalDimensions.current.imageSmall),
+    modifier: Modifier = Modifier.height(LocalDimensions.current.imageSmall)
+        .testTag(Tag.IMG_POSTER),
 ) {
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)

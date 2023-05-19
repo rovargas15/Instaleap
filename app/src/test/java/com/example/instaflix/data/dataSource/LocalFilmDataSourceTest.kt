@@ -17,6 +17,8 @@ import io.mockk.mockkStatic
 import io.mockk.runs
 import io.mockk.verify
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -45,11 +47,11 @@ class LocalFilmDataSourceTest : BaseTest() {
 
         mockkStatic(films::mapToFilms)
 
-        every { filmDao.getAllFilms(category) } returns films
+        every { filmDao.getAllFilms(category) } returns flowOf(films)
         every { films.mapToFilms() } returns expectedResults
 
         // When
-        val result = dataSource.getAllFilms(category)
+        val result = dataSource.getAllFilms(category).single()
 
         // Then
         assertEquals(expectedResults, result)

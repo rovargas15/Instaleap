@@ -10,24 +10,20 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 open class BaseRepository {
-    inline fun <T, R> T.launchSafe(block: T.() -> R): Result<R> {
+    inline fun <T, R> T.launchResultSafe(block: T.() -> R): Result<R> {
         return runCatching {
             block()
         }.onFailure()
     }
 
-    fun <T> Result<T>.recoverCatchingSafe(function: () -> T): Result<T> {
-        return recoverCatching {
-            if (it is InternetException) {
-                function.invoke()
-            } else {
-                throw it
-            }
-        }
+    inline fun <T, R> T.launchSafe(block: T.() -> R): R {
+        return runCatching {
+            block()
+        }.getOrElse { throw getDomainException(it) }
     }
 
     /**
-     * The method getDomainException
+     * The method onFailure
      * uses methods getDomainExceptionFromRetrofitException
      * and getDomainNativeException to convert the appropriate
      * type of exception to a domain exception.
@@ -49,6 +45,24 @@ open class BaseRepository {
             }
         } ?: run {
             return this
+        }
+    }
+
+    /**
+     * The method getDomainException
+     * uses methods getDomainExceptionFromRetrofitException
+     * and getDomainNativeException to convert the appropriate
+     * type of exception to a domain exception.
+     */
+    fun getDomainException(error: Throwable): DomainException {
+        return when (error) {
+            is retrofit2.HttpException -> {
+                getDomainExceptionFromRetrofitException(error)
+            }
+
+            else -> {
+                getDomainExceptionFromNativeException(error)
+            }
         }
     }
 
