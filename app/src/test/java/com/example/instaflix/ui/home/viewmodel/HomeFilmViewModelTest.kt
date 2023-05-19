@@ -59,7 +59,7 @@ class HomeFilmViewModelTest : BaseTest() {
             coEvery { getFilmsByCategoryUC.invoke(any()) } returns Result.success(films)
 
             // When
-            viewModel.onLoad(Route.MOVIE)
+            viewModel.onLoad(Route.FILM)
 
             // Then
             val resultsPopular = mutableListOf<PopularFilmsUiState>()
@@ -104,7 +104,7 @@ class HomeFilmViewModelTest : BaseTest() {
             coEvery { getFilmsByCategoryUC.invoke(any()) } returns Result.failure(error)
 
             // When
-            viewModel.onLoad(Route.MOVIE)
+            viewModel.onLoad(Route.FILM)
 
             // Then
             val resultsPopular = mutableListOf<PopularFilmsUiState>()

@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -91,7 +92,7 @@ private fun ContentDetail(
 fun DetailFilmConstraintLayout(film: Film) {
     val scrollState = rememberScrollState()
     ConstraintLayout(modifier = Modifier.verticalScroll(scrollState)) {
-        val (header, poster, title, date, voteCnl, overview) = createRefs()
+        val (header, poster, title, date, voteText, voteStar, overview) = createRefs()
 
         FilmPoster(
             urlImage = film.backdropPath ?: "",
@@ -117,67 +118,60 @@ fun DetailFilmConstraintLayout(film: Film) {
             text = film.title,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(start = LocalDimensions.current.paddingMedium)
+                .testTag("txtTitle")
                 .constrainAs(title) {
-                    start.linkTo(poster.end, 4.dp)
+                    start.linkTo(poster.end)
                     end.linkTo(header.end, 10.dp)
                     top.linkTo(header.bottom)
-                    bottom.linkTo(poster.bottom)
+                    bottom.linkTo(poster.bottom, 50.dp)
                     width = Dimension.fillToConstraints
                 },
         )
 
         Text(
             text = film.releaseDate,
-            modifier = Modifier.constrainAs(date) {
-                start.linkTo(title.start, 10.dp)
-                top.linkTo(title.bottom)
-            },
+            modifier = Modifier
+                .testTag("txtReleaseDate")
+                .constrainAs(date) {
+                    start.linkTo(title.start, 8.dp)
+                    top.linkTo(title.bottom)
+                },
         )
 
-        Row(
-            modifier = Modifier.padding(top = LocalDimensions.current.paddingMedium)
-                .constrainAs(voteCnl) {
-                    top.linkTo(poster.bottom, 10.dp)
-                    start.linkTo(poster.start)
-                    end.linkTo(header.end)
-                    width = Dimension.fillToConstraints
+        Text(
+            text = film.voteAverage.toString(),
+            modifier = Modifier
+                .testTag("txtVoteAverage")
+                .padding(start = LocalDimensions.current.paddingMedium)
+                .constrainAs(voteText) {
+                    start.linkTo(title.start)
+                    top.linkTo(date.bottom)
                 },
-            horizontalArrangement = Arrangement.SpaceEvenly,
-        ) {
-            ConstraintLayout {
-                val (vote, star) = createRefs()
+        )
 
-                Text(
-                    text = film.voteAverage.toString(),
-                    modifier = Modifier.padding(start = LocalDimensions.current.paddingMedium)
-                        .constrainAs(vote) {
-                            start.linkTo(parent.start)
-                        },
-                )
-
-                Icon(
-                    imageVector = Icons.Outlined.Star,
-                    contentDescription = null,
-                    tint = ColorRate,
-                    modifier = Modifier.constrainAs(star) {
-                        start.linkTo(vote.end)
-                        top.linkTo(vote.top)
-                        bottom.linkTo(vote.bottom)
-                    },
-                )
-            }
-        }
+        Icon(
+            imageVector = Icons.Outlined.Star,
+            contentDescription = null,
+            tint = ColorRate,
+            modifier = Modifier.constrainAs(voteStar) {
+                start.linkTo(voteText.end)
+                top.linkTo(voteText.top)
+                bottom.linkTo(voteText.bottom)
+            },
+        )
 
         Text(
             text = film.overview,
             textAlign = TextAlign.Justify,
-            modifier = Modifier.constrainAs(overview) {
-                top.linkTo(voteCnl.bottom, 10.dp)
-                start.linkTo(poster.start)
-                end.linkTo(header.end, 10.dp)
-                bottom.linkTo(parent.bottom, 10.dp)
-                width = Dimension.fillToConstraints
-            },
+            modifier = Modifier
+                .testTag("txtOverview")
+                .constrainAs(overview) {
+                    top.linkTo(poster.bottom, 10.dp)
+                    start.linkTo(poster.start)
+                    end.linkTo(header.end, 10.dp)
+                    bottom.linkTo(parent.bottom, 10.dp)
+                    width = Dimension.fillToConstraints
+                },
         )
     }
 }

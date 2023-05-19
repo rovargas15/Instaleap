@@ -30,8 +30,8 @@ fun AppNavigation(
 fun NavGraphBuilder.mainGraph(
     navController: NavHostController,
 ) {
-    navigation(startDestination = Route.MOVIE, route = Graph.MAIN_GRAPH) {
-        composable(route = Route.MOVIE) {
+    navigation(startDestination = Route.FILM, route = Graph.MAIN_GRAPH) {
+        composable(route = Route.FILM) {
             HomeScreen(navController) { id: Long ->
                 navController.navigate("detail/$id?")
             }

@@ -36,7 +36,7 @@ object Graph {
 }
 
 object Route {
-    const val MOVIE = "Movie/"
+    const val FILM = "Film/"
     const val SERIES = "Series/"
     const val FILM_DETAIL = "detail/"
 }

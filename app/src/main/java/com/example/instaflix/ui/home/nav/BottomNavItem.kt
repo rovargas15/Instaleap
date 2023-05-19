@@ -9,6 +9,6 @@ import com.example.instaflix.R
 import com.example.instaflix.ui.utils.Route
 
 sealed class BottomNavItem(@StringRes var title: Int, var icon: ImageVector, var route: String) {
-    object MOVIE : BottomNavItem(R.string.movie, Icons.Rounded.Star, Route.MOVIE)
+    object MOVIE : BottomNavItem(R.string.movie, Icons.Rounded.Star, Route.FILM)
     object SERIES : BottomNavItem(R.string.series, Icons.Rounded.Slideshow, Route.SERIES)
 }

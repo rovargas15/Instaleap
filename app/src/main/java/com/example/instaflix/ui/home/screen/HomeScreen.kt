@@ -73,7 +73,7 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
                     .padding(paddingValue),
             ) {
-                val isMovie = Route.MOVIE == backStackEntry.value?.destination?.route
+                val isMovie = Route.FILM == backStackEntry.value?.destination?.route
                 if (isMovie) {
                     HomeContentMovie(
                         homeFilmViewModel = homeFilmViewModel,

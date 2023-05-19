@@ -123,7 +123,7 @@ class HomeFilmViewModel @Inject constructor(
     }
 
     fun onLoad(route: String) {
-        if (route == Route.MOVIE) {
+        if (route == Route.FILM) {
             onLoadMovie()
         } else {
             onLoadSeries()

@@ -16,14 +16,20 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.example.instaflix.runner.InstrumentationRunner"
         vectorDrawables.useSupportLibrary = true
-
         buildConfigField(
             type = "String",
             name = "API_KEY",
             value = "\"${property("API_KEY") ?: ""}\"",
         )
+    }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+        unitTests.isIncludeAndroidResources = true
+        animationsDisabled = true
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
 
     buildTypes {
@@ -57,7 +63,7 @@ android {
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/*"
         }
     }
 }
@@ -133,5 +139,19 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.5")
     testImplementation("androidx.arch.core:core-testing:2.2.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1")
-    implementation("androidx.test.ext:junit-ktx:1.1.5")
+    testImplementation("androidx.test.ext:junit-ktx:1.1.5")
+
+    // Android Test
+
+    // UI Test
+    debugImplementation("androidx.test:core-ktx:1.5.0")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.4.3")
+    debugImplementation("io.mockk:mockk-android:1.12.1")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.3")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
+    androidTestUtil("androidx.test:orchestrator:1.4.2")
 }
