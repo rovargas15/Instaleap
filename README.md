@@ -1,4 +1,4 @@
-# Instaflix
+# Instaleap
 
 Esta es una prueba para Instaleap que consta de un listado de Películas y series con 3 categorías
 cada una.
